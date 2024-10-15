@@ -83,6 +83,9 @@ To create a Next.js app, open your terminal, `cd` into the directory you’d l
 
 ```
 npx create-next-app@latest nextjs-blog --use-npm --example "https://github.com/vercel/next-learn/tree/main/basics/learn-starter"
+npm i @bsv/sdk
+
+refer to https://docs.bsvblockchain.org/intro/quick-start for more info
 
 ```
 
