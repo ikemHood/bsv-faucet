@@ -28,7 +28,7 @@ Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bi
 - [BSV Wiki](https://wiki.bitcoinsv.io/) – Aim to provide correct and up-to-date information on the Bitcoin protocol, network, and its features and functionality.
 - [Paymail](https://tsc.bsvblockchain.org/standards/paymail/) – A collection of protocols for BSV blockchain wallets that allow for a set of simplified user experiences to be delivered across all wallets in the ecosystem.
 
-BSV Quick Start
+## BSV Quick Start
 
 https://docs.bsvblockchain.org/intro/quick-start
 
