@@ -20,11 +20,8 @@ Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bi
 
 ## **Getting Started**
 
-
-
-Getting Started with Bitcoin testnet https://docs.bsvblockchain.org/network-topology/nodes/sv-node/installation/sv-node/network-environments/testnet
-
-System Requirements: https://docs.bsvblockchain.org/network-topology/nodes/sv-node/system-requirements
+- [Getting Started with Bitcoin testnet] (https://docs.bsvblockchain.org/network-topology/nodes/sv-node/installation/sv-node/network-environments/testnet)
+- [System Requirements] (https://docs.bsvblockchain.org/network-topology/nodes/sv-node/system-requirements)
 
 
 
