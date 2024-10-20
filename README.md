@@ -20,6 +20,19 @@ Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bi
 
 ## **Getting Started**
 
+
+
+Getting Started with Bitcoin testnet https://docs.bsvblockchain.org/network-topology/nodes/sv-node/installation/sv-node/network-environments/testnet
+
+System Requirements: https://docs.bsvblockchain.org/network-topology/nodes/sv-node/system-requirements
+
+
+
+## BSV Quick Start
+
+https://docs.bsvblockchain.org/intro/quick-start
+https://www.bsvblockchain.org/features/tools-libraries
+
 - [Bitcoin SV Website](https://bitcoinsv.io/)
 - [Bitcoin SV Wiki](https://en.wikipedia.org/wiki/Bitcoin_SV)
 - [BSV Developer Documentation](https://docs.bitcoinsv.io/)
@@ -28,11 +41,6 @@ Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bi
 - [BSV Wiki](https://wiki.bitcoinsv.io/) – Aim to provide correct and up-to-date information on the Bitcoin protocol, network, and its features and functionality.
 - [Paymail](https://tsc.bsvblockchain.org/standards/paymail/) – A collection of protocols for BSV blockchain wallets that allow for a set of simplified user experiences to be delivered across all wallets in the ecosystem.
 
-## BSV Quick Start
-
-https://docs.bsvblockchain.org/intro/quick-start
-
-https://www.bsvblockchain.org/features/tools-libraries
 
 ## Development Libraries
 
