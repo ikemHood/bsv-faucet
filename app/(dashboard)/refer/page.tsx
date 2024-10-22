@@ -6,12 +6,12 @@ import {
   CardTitle
 } from '@/components/ui/card';
 
-export default function DashboardPage() {
+export default function ReferPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Dashboard</CardTitle>
-        <CardDescription>Dashboard items.</CardDescription>
+        <CardTitle>Refer</CardTitle>
+        <CardDescription>Refer items.</CardDescription>
       </CardHeader>
       <CardContent></CardContent>
     </Card>
