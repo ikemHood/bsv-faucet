@@ -4,31 +4,19 @@ Create an open-source faucet service offering small amounts of digital tokens fo
 
 A testnet faucet provides users with free testnet tokens for testing and development. This allows developers to test their applications and smart contracts before deploying them to the main network.
 
-## Contents
-
-- Introduction
-- Getting Started
-- Development Libraries
-- Application Technology Stack
-- Pre-requisites
-- Steps to get started
-- 
-
 ## Introduction
 
 Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bitcoin, focusing on scalability, security, and stability. This list gathers various resources to help you explore, develop, and contribute to the BSV ecosystem.
 
 ## **Getting Started**
 
-- [Getting Started with Bitcoin testnet] (https://docs.bsvblockchain.org/network-topology/nodes/sv-node/installation/sv-node/network-environments/testnet)
-- [System Requirements] (https://docs.bsvblockchain.org/network-topology/nodes/sv-node/system-requirements)
+- [Getting Started with Bitcoin testnet](https://docs.bsvblockchain.org/network-topology/nodes/sv-node/installation/sv-node/network-environments/testnet)
+- [System Requirements](https://docs.bsvblockchain.org/network-topology/nodes/sv-node/system-requirements)
+  
+#### BSV Quick Start
 
-
-
-## BSV Quick Start
-
-https://docs.bsvblockchain.org/intro/quick-start
-https://www.bsvblockchain.org/features/tools-libraries
+- [Quick Start](https://docs.bsvblockchain.org/intro/quick-start)
+- [BSV Tools and Libraries](https://www.bsvblockchain.org/features/tools-libraries)
 
 - [Bitcoin SV Website](https://bitcoinsv.io/)
 - [Bitcoin SV Wiki](https://en.wikipedia.org/wiki/Bitcoin_SV)
@@ -39,21 +27,14 @@ https://www.bsvblockchain.org/features/tools-libraries
 - [Paymail](https://tsc.bsvblockchain.org/standards/paymail/) – A collection of protocols for BSV blockchain wallets that allow for a set of simplified user experiences to be delivered across all wallets in the ecosystem.
 
 
-## Development Libraries
+#### BSV Development Libraries
 
 - [Official BSV SDK](https://github.com/bitcoin-sv/ts-sdk) maintained by the BSV Association with zero dependencies.
 - [Bitcoin SV Lib](https://github.com/moneybutton/bsv) - A pure and powerful JavaScript Bitcoin SV library. A fork of BitPay's bitcore-lib-cash, but for Bitcoin SV only. Maintained by Yours Inc.
 
-## Application Technology Stack
+#### Application Technology Stack
 
-[**Fullstack App with Next.js, Prisma, and Vercel Postgres**](https://vercel.com/guides/nextjs-prisma-postgres#how-to-build-a-fullstack-app-with-next.js-prisma-and-vercel-postgres)
-
-Create a fullstack application with Next.js, Prisma, Vercel Postgres, and deploy to Vercel
-
----
-
-[Prisma](https://prisma.io/) is a next-generation ORM that can be used to access a database in Node.js and TypeScript applications.
-
+- [Prisma](https://prisma.io/) is a next-generation ORM that can be used to access a database in Node.js and TypeScript applications.
 - [Next.js](https://nextjs.org/) as the React framework
 - [Next.js API Routes](https://nextjs.org/docs/api-routes/introduction) for server-side API routes as the backend
 - [Prisma](https://prisma.io/) as the ORM for migrations and database access
@@ -70,7 +51,7 @@ To successfully finish this guide, you'll need:
 - A Vercel Account (to set up a free Postgres database and deploy the app)
 - A GitHub Account (to create an OAuth app)
 
-## Steps to get started.
+#### Steps to get started.
 
 ## Overview
 
@@ -90,7 +71,7 @@ During the deployment, Vercel will prompt you to create a new Postgres database.
 
 Inside the Vercel Postgres dashboard, create a table based on the schema defined in this repository.
 
-
+```sh
 CREATE TYPE status AS ENUM ('active', 'inactive', 'archived');
 
 CREATE TABLE products (
@@ -102,17 +83,28 @@ CREATE TABLE products (
   stock INTEGER NOT NULL,
   available_at TIMESTAMP NOT NULL
 );
+```
 Then, uncomment app/api/seed.ts and hit http://localhost:3000/api/seed to seed the database with products.
 
 Next, copy the .env.example file to .env and update the values. Follow the instructions in the .env.example file to set up your GitHub OAuth application.
 
-
+```sh
 npm i -g vercel
 vercel link
 vercel env pull
+```
+
 Finally, run the following commands to start the development server:
 
-
+```sh
 pnpm install
 pnpm dev
+```
+
+You'll need the the following BSV Libraries:
+```sh
+npm i @bsv/sdk
+npm i @bsv/paymail
+```
+
 You should now be able to access the application at http://localhost:3000.
