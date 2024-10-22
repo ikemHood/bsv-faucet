@@ -72,50 +72,47 @@ To successfully finish this guide, you'll need:
 
 ## Steps to get started.
 
-## Setup
+## Overview
 
-First, let’s make sure that your development environment is ready.
+Framework - Next.js (App Router)
+Language - TypeScript
+Auth - Auth.js
+Database - Postgres
+Deployment - Vercel
+Styling - Tailwind CSS
+Components - Shadcn UI
+Analytics - Vercel Analytics
+Formatting - Prettier
+This uses the new Next.js App Router. This includes support for enhanced layouts, colocation of components, tests, and styles, component-level data fetching, and more.
 
-- If you don’t have **Node.js** installed, [install it from here](https://nodejs.org/en/). You’ll need Node.js version **18** or higher.
-- You’ll be using your own text editor and terminal app for this tutorial.
+## Getting Started
+During the deployment, Vercel will prompt you to create a new Postgres database. This will add the necessary environment variables to your project.
 
-> If you are on Windows, we recommend downloading Git for Windows and use Git Bash that comes with it, which supports the UNIX-specific commands in this tutorial. Windows Subsystem for Linux (WSL) is another option.
-> 
+Inside the Vercel Postgres dashboard, create a table based on the schema defined in this repository.
 
-### Create a Next.js app
 
-To create a Next.js app, open your terminal, `cd` into the directory you’d like to create the app in, and run the following command:
+CREATE TYPE status AS ENUM ('active', 'inactive', 'archived');
 
-```
-npx create-next-app@latest nextjs-blog --use-npm --example "https://github.com/vercel/next-learn/tree/main/basics/learn-starter"
-npm i @bsv/sdk
+CREATE TABLE products (
+  id SERIAL PRIMARY KEY,
+  image_url TEXT NOT NULL,
+  name TEXT NOT NULL,
+  status status NOT NULL,
+  price NUMERIC(10, 2) NOT NULL,
+  stock INTEGER NOT NULL,
+  available_at TIMESTAMP NOT NULL
+);
+Then, uncomment app/api/seed.ts and hit http://localhost:3000/api/seed to seed the database with products.
 
-refer to https://docs.bsvblockchain.org/intro/quick-start for more info
+Next, copy the .env.example file to .env and update the values. Follow the instructions in the .env.example file to set up your GitHub OAuth application.
 
-```
 
-> Under the hood, this uses the tool called create-next-app, which bootstraps a Next.js app for you. It uses this template through the --example flag.
-> 
-> 
-> If it doesn’t work, please take a look at [this page](https://github.com/vercel/next-learn/blob/main/basics/errors/install.md).
-> 
+npm i -g vercel
+vercel link
+vercel env pull
+Finally, run the following commands to start the development server:
 
-### Run the development server
 
-You now have a new directory called `nextjs-blog`. Let’s `cd` into it:
-
-```
-cd nextjs-blog
-
-```
-
-Then, run the following command:
-
-```
-npm run dev
-
-```
-
-This starts your Next.js app’s "development server" (more on this later) on port **3000**.
-
-Let’s check to see if it’s working. Open [http://localhost:3000](http://localhost:3000/) from your browser.
+pnpm install
+pnpm dev
+You should now be able to access the application at http://localhost:3000.
