@@ -34,14 +34,18 @@ Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bi
 
 #### Application Technology Stack
 
-- [Prisma](https://prisma.io/) is a next-generation ORM that can be used to access a database in Node.js and TypeScript applications.
-- [Next.js](https://nextjs.org/) as the React framework
-- [Next.js API Routes](https://nextjs.org/docs/api-routes/introduction) for server-side API routes as the backend
-- [Prisma](https://prisma.io/) as the ORM for migrations and database access
-- [Vercel Postgres](https://vercel.com/storage/postgres) as the database
-- [NextAuth.js](https://next-auth.js.org/) for authentication via GitHub (OAuth)
-- [TypeScript](https://www.typescriptlang.org/) as the programming language
-- [Vercel](http://vercel.com/) deployment
+- Framework - Next.js (App Router)
+- Language - TypeScript
+- Auth - Auth.js
+- Database - Postgres
+- Deployment - Vercel
+- Styling - Tailwind CSS
+- Components - Shadcn UI
+- Analytics - Vercel Analytics
+- Formatting - Prettier
+
+This uses the new Next.js App Router. This includes support for enhanced layouts, colocation of components, tests, and styles, component-level data fetching, and more.
+
 
 ## Pre-requisites
 
@@ -51,20 +55,6 @@ To successfully finish this guide, you'll need:
 - A Vercel Account (to set up a free Postgres database and deploy the app)
 - A GitHub Account (to create an OAuth app)
 
-#### Steps to get started.
-
-## Overview
-
-Framework - Next.js (App Router)
-Language - TypeScript
-Auth - Auth.js
-Database - Postgres
-Deployment - Vercel
-Styling - Tailwind CSS
-Components - Shadcn UI
-Analytics - Vercel Analytics
-Formatting - Prettier
-This uses the new Next.js App Router. This includes support for enhanced layouts, colocation of components, tests, and styles, component-level data fetching, and more.
 
 ## Getting Started
 During the deployment, Vercel will prompt you to create a new Postgres database. This will add the necessary environment variables to your project.
