@@ -4,31 +4,19 @@ Create an open-source faucet service offering small amounts of digital tokens fo
 
 A testnet faucet provides users with free testnet tokens for testing and development. This allows developers to test their applications and smart contracts before deploying them to the main network.
 
-## Contents
-
-- Introduction
-- Getting Started
-- Development Libraries
-- Application Technology Stack
-- Pre-requisites
-- Steps to get started
-- 
-
 ## Introduction
 
 Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bitcoin, focusing on scalability, security, and stability. This list gathers various resources to help you explore, develop, and contribute to the BSV ecosystem.
 
 ## **Getting Started**
 
-- [Getting Started with Bitcoin testnet] (https://docs.bsvblockchain.org/network-topology/nodes/sv-node/installation/sv-node/network-environments/testnet)
-- [System Requirements] (https://docs.bsvblockchain.org/network-topology/nodes/sv-node/system-requirements)
+- [Getting Started with Bitcoin testnet](https://docs.bsvblockchain.org/network-topology/nodes/sv-node/installation/sv-node/network-environments/testnet)
+- [System Requirements](https://docs.bsvblockchain.org/network-topology/nodes/sv-node/system-requirements)
+  
+#### BSV Quick Start
 
-
-
-## BSV Quick Start
-
-https://docs.bsvblockchain.org/intro/quick-start
-https://www.bsvblockchain.org/features/tools-libraries
+- [Quick Start](https://docs.bsvblockchain.org/intro/quick-start)
+- [BSV Tools and Libraries](https://www.bsvblockchain.org/features/tools-libraries)
 
 - [Bitcoin SV Website](https://bitcoinsv.io/)
 - [Bitcoin SV Wiki](https://en.wikipedia.org/wiki/Bitcoin_SV)
@@ -39,28 +27,25 @@ https://www.bsvblockchain.org/features/tools-libraries
 - [Paymail](https://tsc.bsvblockchain.org/standards/paymail/) – A collection of protocols for BSV blockchain wallets that allow for a set of simplified user experiences to be delivered across all wallets in the ecosystem.
 
 
-## Development Libraries
+#### BSV Development Libraries
 
 - [Official BSV SDK](https://github.com/bitcoin-sv/ts-sdk) maintained by the BSV Association with zero dependencies.
 - [Bitcoin SV Lib](https://github.com/moneybutton/bsv) - A pure and powerful JavaScript Bitcoin SV library. A fork of BitPay's bitcore-lib-cash, but for Bitcoin SV only. Maintained by Yours Inc.
 
-## Application Technology Stack
+#### Application Technology Stack
 
-[**Fullstack App with Next.js, Prisma, and Vercel Postgres**](https://vercel.com/guides/nextjs-prisma-postgres#how-to-build-a-fullstack-app-with-next.js-prisma-and-vercel-postgres)
+- Framework - Next.js (App Router)
+- Language - TypeScript
+- Auth - Auth.js
+- Database - Postgres
+- Deployment - Vercel
+- Styling - Tailwind CSS
+- Components - Shadcn UI
+- Analytics - Vercel Analytics
+- Formatting - Prettier
 
-Create a fullstack application with Next.js, Prisma, Vercel Postgres, and deploy to Vercel
+This uses the new Next.js App Router. This includes support for enhanced layouts, colocation of components, tests, and styles, component-level data fetching, and more.
 
----
-
-[Prisma](https://prisma.io/) is a next-generation ORM that can be used to access a database in Node.js and TypeScript applications.
-
-- [Next.js](https://nextjs.org/) as the React framework
-- [Next.js API Routes](https://nextjs.org/docs/api-routes/introduction) for server-side API routes as the backend
-- [Prisma](https://prisma.io/) as the ORM for migrations and database access
-- [Vercel Postgres](https://vercel.com/storage/postgres) as the database
-- [NextAuth.js](https://next-auth.js.org/) for authentication via GitHub (OAuth)
-- [TypeScript](https://www.typescriptlang.org/) as the programming language
-- [Vercel](http://vercel.com/) deployment
 
 ## Pre-requisites
 
@@ -70,52 +55,46 @@ To successfully finish this guide, you'll need:
 - A Vercel Account (to set up a free Postgres database and deploy the app)
 - A GitHub Account (to create an OAuth app)
 
-## Steps to get started.
 
-## Setup
+## Getting Started
+During the deployment, Vercel will prompt you to create a new Postgres database. This will add the necessary environment variables to your project.
 
-First, let’s make sure that your development environment is ready.
+Inside the Vercel Postgres dashboard, create a table based on the schema defined in this repository.
 
-- If you don’t have **Node.js** installed, [install it from here](https://nodejs.org/en/). You’ll need Node.js version **18** or higher.
-- You’ll be using your own text editor and terminal app for this tutorial.
+```sh
+CREATE TYPE status AS ENUM ('active', 'inactive', 'archived');
 
-> If you are on Windows, we recommend downloading Git for Windows and use Git Bash that comes with it, which supports the UNIX-specific commands in this tutorial. Windows Subsystem for Linux (WSL) is another option.
-> 
-
-### Create a Next.js app
-
-To create a Next.js app, open your terminal, `cd` into the directory you’d like to create the app in, and run the following command:
-
+CREATE TABLE products (
+  id SERIAL PRIMARY KEY,
+  image_url TEXT NOT NULL,
+  name TEXT NOT NULL,
+  status status NOT NULL,
+  price NUMERIC(10, 2) NOT NULL,
+  stock INTEGER NOT NULL,
+  available_at TIMESTAMP NOT NULL
+);
 ```
-npx create-next-app@latest nextjs-blog --use-npm --example "https://github.com/vercel/next-learn/tree/main/basics/learn-starter"
+Then, uncomment app/api/seed.ts and hit http://localhost:3000/api/seed to seed the database with products.
+
+Next, copy the .env.example file to .env and update the values. Follow the instructions in the .env.example file to set up your GitHub OAuth application.
+
+```sh
+npm i -g vercel
+vercel link
+vercel env pull
+```
+
+Finally, run the following commands to start the development server:
+
+```sh
+pnpm install
+pnpm dev
+```
+
+You'll need the the following BSV Libraries:
+```sh
 npm i @bsv/sdk
-
-refer to https://docs.bsvblockchain.org/intro/quick-start for more info
-
+npm i @bsv/paymail
 ```
 
-> Under the hood, this uses the tool called create-next-app, which bootstraps a Next.js app for you. It uses this template through the --example flag.
-> 
-> 
-> If it doesn’t work, please take a look at [this page](https://github.com/vercel/next-learn/blob/main/basics/errors/install.md).
-> 
-
-### Run the development server
-
-You now have a new directory called `nextjs-blog`. Let’s `cd` into it:
-
-```
-cd nextjs-blog
-
-```
-
-Then, run the following command:
-
-```
-npm run dev
-
-```
-
-This starts your Next.js app’s "development server" (more on this later) on port **3000**.
-
-Let’s check to see if it’s working. Open [http://localhost:3000](http://localhost:3000/) from your browser.
+You should now be able to access the application at http://localhost:3000.

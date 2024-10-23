@@ -6,12 +6,12 @@ import {
   CardTitle
 } from '@/components/ui/card';
 
-export default function DashboardPage() {
+export default function AdminPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Dashboard</CardTitle>
-        <CardDescription>Dashboard items.</CardDescription>
+        <CardTitle>Admin</CardTitle>
+        <CardDescription>Admin items.</CardDescription>
       </CardHeader>
       <CardContent></CardContent>
     </Card>

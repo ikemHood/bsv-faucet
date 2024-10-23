@@ -4,49 +4,47 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
+  CardContent,
 } from '@/components/ui/card';
-import { signInWithEmail } from '@/lib/auth'; // Hypothetical function for email sign-in
 import { BsvTextLogo } from '@/components/icons';
-import { signIn } from '@/lib/auth'; // GitHub sign-in function
 import { useRouter } from 'next/navigation'; // Import useRouter
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter(); // Initialize useRouter
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      await signInWithEmail(email, password); // Custom function to authenticate user
-      window.location.href = '/'; // Redirect after successful login
+      // Replace this with your sign-up logic
+      await signUpWithEmail(email, password); // Hypothetical function for signing up
+      router.push('/'); // Redirect after successful sign-up
     } catch (err) {
-      setError('Invalid credentials, please try again.');
+      setError('Sign up failed, please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGithubSignIn = async () => {
-    try {
-      await signIn('github', { redirectTo: '/' }); // GitHub sign-in
-    } catch (err) {
-      setError('GitHub login failed, please try again.');
-    }
-  };
-
-  const handleSignupRedirect = () => {
-    router.push('/signup'); // Redirect to the signup page
+  const handleLoginRedirect = () => {
+    router.push('/login'); 
   };
 
   return (
@@ -56,13 +54,13 @@ export default function LoginPage() {
           <BsvTextLogo className="h-12 w-15 transition-all group-hover:scale-110" />
         </div>
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardTitle className="text-2xl">Sign Up</CardTitle>
           <CardDescription>
-            Please enter your email and password to log in.
+            Please create an account by filling in the details below.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="w-full space-y-4">
+          <form onSubmit={handleSignUp} className="w-full space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium">
                 Email
@@ -89,25 +87,34 @@ export default function LoginPage() {
                 required
               />
             </div>
+            <div>
+              <label htmlFor="confirm-password" className="block text-sm font-medium">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                id="confirm-password"
+                className="mt-1 w-full px-3 py-2 border rounded-md"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Logging in...' : 'Login'}
-            </Button>
-            <h6 className="text-center">or</h6>
-            <Button type="button" className="w-full" onClick={handleGithubSignIn}>
-              Sign in with GitHub
+              {loading ? 'Signing up...' : 'Sign Up'}
             </Button>
           </form>
         </CardContent>
         <CardFooter>
           <div className="mt-4 text-center">
             <span className="text-sm">
-              Don't have an account?{' '}
+              Already have an account?{' '}
               <button
-                onClick={handleSignupRedirect}
+                onClick={handleLoginRedirect}
                 className="text-blue-500 hover:underline"
               >
-                Sign Up
+                Login
               </button>
             </span>
           </div>
@@ -115,4 +122,9 @@ export default function LoginPage() {
       </Card>
     </div>
   );
+}
+
+// Hypothetical function for signing up
+async function signUpWithEmail(email: string, password: string) {
+  // Implement your sign-up logic here
 }
