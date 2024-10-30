@@ -1,11 +1,11 @@
+import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 
 import { Analytics } from '@vercel/analytics/react';
 
 export const metadata = {
   title: 'BSV',
-  description:
-    'BSV.'
+  description: 'BSV.'
 };
 
 export default function RootLayout({
@@ -15,7 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="flex min-h-screen w-full flex-col">{children}</body>
+      <body className="flex min-h-screen w-full flex-col">
+        {children}
+        <Toaster />
+      </body>
       <Analytics />
     </html>
   );
