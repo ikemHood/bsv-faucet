@@ -1,19 +1,23 @@
 'use client'
 
 import { useState } from 'react'
-import { Form, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form'
+import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form'
 import { useToast } from 'hooks/use-toast'
 
 const formSchema = z.object({
   threshold: z.number().min(0, "Threshold must be a positive number"),
-  emails: z.array(z.string().email("Invalid email address")).min(1, "At least one email is required"),
-  phoneNumbers: z.array(z.string().regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number")).optional(),
+  emails: z.string().refine(value => value.split(',').every(email => z.string().email().safeParse(email.trim()).success), {
+    message: "Invalid email address"
+  }),
+  phoneNumbers: z.string().optional().refine(value => !value || value.split(',').every(phone => /^\+?[1-9]\d{1,14}$/.test(phone.trim())), {
+    message: "Invalid phone number"
+  }),
 })
 
 export default function WalletSettingsPage() {
@@ -24,8 +28,8 @@ export default function WalletSettingsPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       threshold: 0,
-      emails: [''],
-      phoneNumbers: [''],
+      emails: '',
+      phoneNumbers: '',
     },
   })
 
@@ -35,7 +39,11 @@ export default function WalletSettingsPage() {
       const response = await fetch('', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          ...values,
+          emails: values.emails.split(',').map(email => email.trim()),
+          phoneNumbers: values.phoneNumbers ? values.phoneNumbers.split(',').map(phone => phone.trim()) : [],
+        }),
       })
       if (!response.ok) throw new Error('Failed to save settings')
       toast({
@@ -88,7 +96,7 @@ export default function WalletSettingsPage() {
                     <Input {...field} placeholder="Enter email addresses separated by commas" />
                   </FormControl>
                   <FormDescription>
-                    Enter the email addresses that should receive alerts
+                    Enter the email addresses that should receive alerts, separated by commas
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -104,7 +112,7 @@ export default function WalletSettingsPage() {
                     <Input {...field} placeholder="Enter phone numbers separated by commas" />
                   </FormControl>
                   <FormDescription>
-                    Enter the phone numbers that should receive SMS alerts (if enabled)
+                    Enter the phone numbers that should receive SMS alerts (if enabled), separated by commas
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
