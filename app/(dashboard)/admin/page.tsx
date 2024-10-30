@@ -1,4 +1,4 @@
-import AdminTreasuryHistory from '@/components/AdminTreasuryHistory';
+import AdminTreasuryHistory from '@/components/adminTreasuryHistory/AdminTreasuryHistory';
 import {
   Card,
   CardContent,
