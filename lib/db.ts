@@ -18,6 +18,16 @@ import * as donations from './models/donations';
 
 export const db = drizzle(neon(process.env.POSTGRES_URL!));
 
+export const roleEnum = pgEnum('role', ['user', 'admin']);
+
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id').unique().notNull(),
+  username: text('username').unique().notNull(),
+  email: text('email').unique().notNull(),
+  role: roleEnum('role').notNull()
+});
+
 export const statusEnum = pgEnum('status', ['active', 'inactive', 'archived']);
 
 export const products = pgTable('products', {
