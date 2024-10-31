@@ -1,6 +1,6 @@
 import { PrivateKey } from '@bsv/sdk';
 
-export function generateWallet() {
+export const generateWallet = () => {
   const privateKey = PrivateKey.fromRandom();
   
   const wif = privateKey.toWif();
