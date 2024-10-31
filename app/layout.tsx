@@ -4,6 +4,8 @@ import './globals.css';
 
 import { Analytics } from '@vercel/analytics/react';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'BSV',
   description: 'BSV.'
@@ -26,3 +28,4 @@ export default function RootLayout({
     </ClerkProvider>
   );
 }
+
