@@ -15,7 +15,9 @@ export async function GET(request: NextRequest) {
         userId: user.id,
         username: user.username,
         email: user.emailAddresses[0].emailAddress,
-        role: 'user'
+        password: 'defaultPassword',
+        role: 'user',
+        theme: 'light'
       }
     ]);
   } catch (error) {}
