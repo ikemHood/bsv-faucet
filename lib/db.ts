@@ -103,5 +103,4 @@ export const wallets = pgTable('wallets', {
   address: text('address').unique().notNull(),
   privateKey: text('privateKey').notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
-  balance: numeric('balance', { precision: 20, scale: 0 }).notNull().default('0'),
 });
