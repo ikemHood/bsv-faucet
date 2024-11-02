@@ -12,6 +12,9 @@ importers:
 
   .:
     dependencies:
+      '@bsv/sdk':
+        specifier: ^1.1.29
+        version: 1.1.29
       '@clerk/nextjs':
         specifier: ^6.0.2
         version: 6.0.2(next@15.0.0-rc.1(react-dom@19.0.0-rc-cd22717c-20241013(react@19.0.0-rc-cd22717c-20241013))(react@19.0.0-rc-cd22717c-20241013))(react-dom@19.0.0-rc-cd22717c-20241013(react@19.0.0-rc-cd22717c-20241013))(react@19.0.0-rc-cd22717c-20241013)
@@ -180,6 +183,9 @@ packages:
         optional: true
       nodemailer:
         optional: true
+
+  '@bsv/sdk@1.1.29':
+    resolution: {integrity: sha512-Q8ks6mzkmcUz95ny16C9D/S22esqaLa5lXcXp0dLKdcwW9hFd6eUI6nRj3P086FJRSgCPfEGY8ORQPhR9VLlQQ==}
 
   '@clerk/backend@1.15.1':
     resolution: {integrity: sha512-yoBCji0bJFn2bUxBOO0+6XmlN6Tb5M2CiW+DAX7V3pFQ7g7DnHjSZ/LVkt9yB0AmqHKPv1ISXWM/NFYSDBRVuA==}
@@ -2535,6 +2541,8 @@ snapshots:
       oauth4webapi: 2.11.1
       preact: 10.11.3
       preact-render-to-string: 5.2.3(preact@10.11.3)
+
+  '@bsv/sdk@1.1.29': {}
 
   '@clerk/backend@1.15.1(react-dom@19.0.0-rc-cd22717c-20241013(react@19.0.0-rc-cd22717c-20241013))(react@19.0.0-rc-cd22717c-20241013)':
     dependencies:
