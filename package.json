@@ -7,6 +7,7 @@
     "knex": "knex"
   },
   "dependencies": {
+    "@bsv/sdk": "^1.1.29",
     "@clerk/nextjs": "^6.0.2",
     "@hookform/resolvers": "^3.9.0",
     "@neondatabase/serverless": "^0.9.4",
