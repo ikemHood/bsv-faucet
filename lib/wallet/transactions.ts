@@ -7,6 +7,7 @@ import {
 } from '@bsv/sdk';
 import { getUTXOs, getRawTransaction, broadcastTransaction } from './regest';
 import { PrismaClient } from '@prisma/client';
+import { db, transactions } from '../db';
 
 interface UTXO {
   tx_hash: string;
@@ -140,21 +141,19 @@ export const createAndSendTransaction = async (
       throw new Error('Failed to broadcast transaction');
     }
 
-    await prisma.transaction.create({
-      data: {
-        txid,
-        rawTx,
-        beefTx: transactionToObject(tx),
-        vout: outputs.map(output => ({
-          address: toAddress,
-          satoshis: output.satoshis
-        })),
-        txType: "outgoing",
-        spentStatus: false,
-        testnetFlag: network === 'testnet',
-        amount: BigInt(amount)
-      }
-    });
+    await db.insert(transactions).values([{
+      txid,
+      rawTx,
+      beefTx: transactionToObject(tx),
+      vout: outputs.map(output => ({
+        address: toAddress,
+        satoshis: output.satoshis
+      })),
+      txType: "outgoing",
+      spentStatus: false,
+      testnetFlag: network === 'testnet',
+      amount: amount.toString()
+    }]);
 
     return txid;
   } catch (error) {
