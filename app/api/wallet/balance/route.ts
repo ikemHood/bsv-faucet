@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const wif = 'L1tXvFktWLhJ7TZpWg6NBtFLnjguAUfnZhVMFtBVJ3WFM6TJKNKx';
+  const wif = process.env.TREASURY_WALLET_WIF;
 
   if (!wif) {
     return NextResponse.json({ error: 'WIF is required' }, { status: 400 });
