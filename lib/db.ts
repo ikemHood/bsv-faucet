@@ -11,7 +11,7 @@ import {
   pgEnum,
   serial,
   json,
-  boolean
+  boolean,
   varchar
 } from 'drizzle-orm/pg-core';
 import { count, eq, ilike } from 'drizzle-orm';
