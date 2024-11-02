@@ -9,7 +9,9 @@ import {
   integer,
   timestamp,
   pgEnum,
-  serial
+  serial,
+  json,
+  boolean
 } from 'drizzle-orm/pg-core';
 import { count, eq, ilike } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
@@ -80,3 +82,14 @@ export async function getProducts(
 export async function deleteProductById(id: number) {
   await db.delete(products).where(eq(products.id, id));
 }
+
+export const transactions = pgTable('transactions', {
+  txid: text('txid').primaryKey(),
+  rawTx: text('rawTx').notNull(),
+  beefTx: json('beefTx').notNull(),
+  vout: json('vout').notNull(),
+  txType: text('txType').notNull(),
+  spentStatus: boolean('spentStatus').notNull().default(false),
+  testnetFlag: boolean('testnetFlag').notNull(),
+  amount: text('amount').notNull()
+});
