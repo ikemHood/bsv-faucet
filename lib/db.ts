@@ -12,6 +12,7 @@ import {
   serial,
   json,
   boolean
+  varchar
 } from 'drizzle-orm/pg-core';
 import { count, eq, ilike } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
@@ -19,13 +20,15 @@ import { createInsertSchema } from 'drizzle-zod';
 export const db = drizzle(neon(process.env.POSTGRES_URL!));
 
 export const roleEnum = pgEnum('role', ['user', 'admin']);
-
+export const themesEnum = pgEnum('theme', ['light', 'dark']);
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
+  username: varchar('username', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull(),
+  password: varchar('password', { length: 255 }).notNull(),
+  theme: text('theme').default('light'),
   userId: text('user_id').unique().notNull(),
-  username: text('username').unique().notNull(),
-  email: text('email').unique().notNull(),
-  role: roleEnum('role').notNull()
+  role: roleEnum('role').notNull(),
 });
 
 export const statusEnum = pgEnum('status', ['active', 'inactive', 'archived']);
