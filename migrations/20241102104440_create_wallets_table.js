@@ -6,8 +6,8 @@ exports.up = function (knex) {
     return knex.schema.createTable('wallets', function (table) {
         table.increments('id').primary();
         table.text('address').unique().notNullable();
-        table.text('private_key').notNullable();
-        table.timestamp('created_at').defaultTo(knex.fn.now()).notNullable();
+        table.text('privateKey').notNullable();
+        table.timestamp('createdAt').defaultTo(knex.fn.now()).notNullable();
     });
 };
 
