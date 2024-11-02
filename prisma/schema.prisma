@@ -1,0 +1,21 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Transaction {
+  id               Int      @id @default(autoincrement())
+  date             DateTime @default(now())
+  txid             String   @unique
+  rawTx            String   // Raw transaction data
+  beefTx           Json     // Parsed transaction details for analysis
+  vout             Json     // Outputs tracking array, to check if spendable
+  txType           String   // Transaction type: incoming or outgoing
+  spentStatus      Boolean  @default(false) // Whether the transaction is spent
+  testnetFlag      Boolean  @default(true)  // Set to true for testnet transactions
+  amount           BigInt   // Amount in satoshis for precision
+}

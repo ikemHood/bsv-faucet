@@ -1,3 +1,4 @@
+import AdminTreasuryHistory from '@/components/adminTreasuryHistory/AdminTreasuryHistory';
 import {
   Card,
   CardContent,
@@ -14,6 +15,8 @@ export default function AdminPage() {
         <CardDescription>Admin items.</CardDescription>
       </CardHeader>
       <CardContent></CardContent>
+
+      <AdminTreasuryHistory />
     </Card>
   );
 }
