@@ -54,7 +54,7 @@ export default function DonationForm() {
     <div className="grid gap-4">
       <div className="grid md:grid-cols-2 gap-4">
       <Card className='w-full max-w-lg'>
-        <CardContent>
+        <CardContent className='h-full w-full flex items-center'>
             <div className="p-4 rounded-lg">
               <div className="text-sm font-medium">Fuacet Address</div>
               <div className="text-xl bg-secondary rounded-lg p-2 font-semibold" onClick={() => {
