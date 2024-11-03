@@ -6,7 +6,11 @@ import { useDonation } from "@/hooks/useDonation";
 export default function DonationHistory() {
     const { donations, isLoading } = useDonation();
 
-    if (isLoading) return <LoadingState />;
+    if (isLoading) {
+        return <div className="flex p-4 h-full">
+            <LoadingState />
+        </div>;
+    }
 
     return (
         <div className="flex flex-col gap-4">
