@@ -7,7 +7,7 @@ import {
   CardContent,
 } from '@/components/ui/card';
 
-export default function LoginPage() {
+export default function DonationForm() {
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
