@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertTriangle, Copy } from 'lucide-react';
+import { AlertTriangle, Copy, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -103,6 +103,10 @@ const AdminTreasury = () => {
     navigator.clipboard.writeText(text);
   };
 
+  const handleMineBlock = () => {
+    console.log('Mining block');
+  };
+
   if (error) {
     return (
       <Alert variant="destructive">
@@ -117,7 +121,19 @@ const AdminTreasury = () => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Treasury Balance</CardTitle>
+          <div className="flex w-full justify-between">
+            <CardTitle>Treasury Balance</CardTitle>
+            <div className="relative">
+              <Button variant="outline" className={treasuryData.isLowBalance ? 'animate-pulse border-destructive' : ''} onClick={handleMineBlock}>
+                <RefreshCcw className="w-4 h-4" /> Mine Block
+              </Button>
+              {treasuryData.isLowBalance && (
+                <div className="absolute -top-2 -right-2 w-4 h-4 rounded-full animate-pulse">
+                  <AlertTriangle className="w-4 h-4 text-destructive" />
+                </div>
+              )}
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
