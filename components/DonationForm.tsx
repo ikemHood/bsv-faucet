@@ -11,6 +11,8 @@ export default function DonationForm() {
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  //TODO: replace dummy address with faucet address
+  const address = '0x1234567890123456789012345678901234567890';
 
   //TODO: Implement wallet logic
   const [balance, setBalance] = useState(1000);
@@ -35,7 +37,12 @@ export default function DonationForm() {
   }
 
   return (
-    <div className="min-h-screen flex justify-center items-start md:items-center p-8">
+    <div className="">
+      <p className="text-md text-muted-foreground font-bold p-2">Donation to Fuacet</p>
+      <p className="text-sm text-muted-foreground p-2">
+        Fuacet address: <address>{address}</address>
+      </p>
+
       <Card className="w-full max-w-sm">
         <CardContent>
           <form onSubmit={handleDonate} className="w-full space-y-4">

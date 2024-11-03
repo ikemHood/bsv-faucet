@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
+import DonationForm from '@/components/DonationForm';
 
 export default function DashboardPage() {
   return (
@@ -13,7 +14,9 @@ export default function DashboardPage() {
         <CardTitle>Dashboard</CardTitle>
         <CardDescription>Dashboard items.</CardDescription>
       </CardHeader>
-      <CardContent></CardContent>
+      <CardContent>
+        <DonationForm />
+      </CardContent>
     </Card>
   );
 }
