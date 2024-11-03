@@ -19,3 +19,14 @@ model Transaction {
   testnetFlag      Boolean  @default(true)  // Set to true for testnet transactions
   amount           BigInt   // Amount in satoshis for precision
 }
+
+
+model User {
+  id               Int      @id @default(autoincrement())
+  username         String   @unique
+  email            String   @unique
+  password         String
+  theme            String   @default("light")
+  userId           String   @unique
+  role             String   @default("user")
+}

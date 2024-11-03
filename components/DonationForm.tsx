@@ -1,29 +1,43 @@
 'use client';
 
 import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
 } from '@/components/ui/card';
+import { createAndSendTransaction } from '@/lib/wallet/transactions';
+import { DepositHistoryTable } from '@/components/AdminTreasuryHistory';
+import { useDonation } from '@/hooks/useDonation';
 
 export default function DonationForm() {
-  const [amount, setAmount] = useState('');
+  const { donate, adminWallet, isLoading, error } = useDonation();
+  const [amount, setAmount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  //TODO: replace dummy address with faucet address
-  const address = '0x1234567890123456789012345678901234567890';
+  const { toast } = useToast();
 
   //TODO: Implement wallet logic
   const [balance, setBalance] = useState(1000);
   const [isConnected, setIsConnected] = useState(false);
+  const [wif, setWif] = useState<string >("");
 
-  function handleDonate(e: React.FormEvent) {
+  async function handleDonate(e: React.FormEvent) {
+    e.preventDefault();
     if (!isConnected) {
       handleConnectWallet();
     }
-    e.preventDefault();
     console.log('Form submitted');
+    // try {
+    //   const res = await donate(amount, adminWallet?.address, wif);
+    //   console.log('Transaction sent:', res);
+    //   toast({
+    //     title: 'Transaction sent',
+    //     description: `Transaction ID: ${res.txid}`
+    //   });
+    // } catch (error) {
+    //   console.error('Error sending transaction:', error);
+    // }
   }
 
   function handleConnectWallet() {
@@ -33,14 +47,14 @@ export default function DonationForm() {
 
   function handleSelectPercentage(percentage: number) {
     const calculatedAmount = (balance * percentage / 100).toFixed(2);
-    setAmount(calculatedAmount);
+    setAmount(Number(calculatedAmount));
   }
 
   return (
     <div className="">
       <p className="text-md text-muted-foreground font-bold p-2">Donation to Fuacet</p>
       <p className="text-sm text-muted-foreground p-2">
-        Fuacet address: <address>{address}</address>
+        Fuacet address: <address>{adminWallet?.address}</address>
       </p>
 
       <Card className="w-full max-w-sm">
@@ -81,7 +95,7 @@ export default function DonationForm() {
                   id="amount"
                   className="mt-1 w-full px-3 py-2 border rounded-md"
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={(e) => setAmount(Number(e.target.value))}
                   required
                 />
                 {isConnected && (
@@ -91,7 +105,7 @@ export default function DonationForm() {
                 )}
               </div>
             </div>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {/* {error && <p className="text-red-500 text-sm">{error}</p>} */}
             <Button type="submit" className="w-full" disabled={loading}>
               {isConnected ? loading ? 'Donating...' : 'Donate' : 'Connect Wallet'}
             </Button>
