@@ -20,7 +20,7 @@ export default function DonationForm() {
   //TODO: Implement wallet logic
   const [balance, setBalance] = useState(1000);
   const [isConnected, setIsConnected] = useState(false);
-  const [wif, setWif] = useState<string >("");
+  const [wif, setWif] = useState<string>("");
 
   async function handleDonate(e: React.FormEvent) {
     e.preventDefault();
@@ -51,13 +51,26 @@ export default function DonationForm() {
   }
 
   return (
-    <div className="">
-      <p className="text-md text-muted-foreground font-bold p-2">Donation to Fuacet</p>
-      <p className="text-sm text-muted-foreground p-2">
-        Fuacet address: <address>{adminWallet?.address}</address>
-      </p>
+    <div className="grid gap-4">
+      <div className="grid md:grid-cols-2 gap-4">
+      <Card className='w-full max-w-lg'>
+        <CardContent>
+            <div className="p-4 rounded-lg">
+              <div className="text-sm font-medium">Fuacet Address</div>
+              <div className="text-xl bg-secondary rounded-lg p-2 font-semibold" onClick={() => {
+                navigator.clipboard.writeText(adminWallet?.address || '');
+                toast({
+                  title: 'Copied to clipboard',
+                  description: `Fuacet address copied to clipboard`
+                });
+              }}>
+                {adminWallet?.address}
+              </div>
+            </div>
+        </CardContent>
+      </Card>
 
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-lg">
         <CardContent>
           <form onSubmit={handleDonate} className="w-full space-y-4">
             <div>
@@ -112,6 +125,7 @@ export default function DonationForm() {
           </form>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
