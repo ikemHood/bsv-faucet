@@ -147,10 +147,25 @@ bash
 npx knex migrate:latest
 ```
 
+## Error running the migrations
+
+In case you encounter an error during the migration process, do the following steps:
+
+1. Run the following command to source the env variables:
+
+```sh
+source .env
+```
+2. Run the migration scripts again
+
+3. If this doesn't work, run the following command:
+
+```sh
+POSTGRES_URL="..." pnpm knex migrate:latest
+```
+
 This will apply all pending migrations to your local database. You can revert changes using:
 ```sh
-bash
-
 npx knex migrate:rollback
 ```
 
