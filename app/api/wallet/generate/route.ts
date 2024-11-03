@@ -14,5 +14,5 @@ export async function GET() {
       { error: 'Failed to generate wallet' },
       { status: 500 }
     );
-  }ß
+  }
 }

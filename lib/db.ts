@@ -118,7 +118,6 @@ export const transactions = pgTable('transactions', {
   spentStatus: boolean('spentStatus').notNull().default(false),
   testnetFlag: boolean('testnetFlag').notNull(),
   amount: numeric('amount', { precision: 20, scale: 0 }).notNull(),
-  fee: numeric('fee', { precision: 20, scale: 0 }),
 });
 
 export const wallets = pgTable('wallets', {
@@ -126,5 +125,4 @@ export const wallets = pgTable('wallets', {
   address: text('address').unique().notNull(),
   privateKey: text('privateKey').notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
-  balance: numeric('balance', { precision: 20, scale: 0 }).notNull().default('0'),
 });
