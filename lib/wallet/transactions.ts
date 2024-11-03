@@ -1,13 +1,6 @@
-import {
-  PrivateKey,
-  P2PKH,
-  Transaction,
-  TransactionInput,
-  UnlockingScript
-} from '@bsv/sdk';
+import { PrivateKey, P2PKH, Transaction, TransactionInput } from '@bsv/sdk';
 import { getUTXOs, getRawTransaction, broadcastTransaction } from './regest';
 import { PrismaClient } from '@prisma/client';
-import { db, transactions } from '../db';
 
 interface UTXO {
   tx_hash: string;
@@ -23,12 +16,12 @@ interface TransactionOutput {
 function transactionToObject(tx: Transaction): Record<string, any> {
   return {
     version: tx.version,
-    inputs: tx.inputs.map(input => ({
+    inputs: tx.inputs.map((input) => ({
       txid: input.sourceTransaction?.hash.toString(),
       vout: input.sourceOutputIndex,
       sequence: input.sequence
     })),
-    outputs: tx.outputs.map(output => ({
+    outputs: tx.outputs.map((output) => ({
       satoshis: output.satoshis,
       lockingScript: output.lockingScript.toASM()
     }))
@@ -128,32 +121,31 @@ export const createAndSendTransaction = async (
 
     for (let i = 0; i < tx.inputs.length; i++) {
       const input = tx.inputs[i];
-
       const p2pkhUnlock = new P2PKH().unlock(privateKey);
-
       input.unlockingScript = await p2pkhUnlock.sign(tx, i);
     }
 
     const rawTx = tx.toHex();
-
     const txid = await broadcastTransaction(rawTx);
     if (!txid) {
       throw new Error('Failed to broadcast transaction');
     }
 
-    await db.insert(transactions).values([{
-      txid,
-      rawTx,
-      beefTx: transactionToObject(tx),
-      vout: outputs.map(output => ({
-        address: toAddress,
-        satoshis: output.satoshis
-      })),
-      txType: "outgoing",
-      spentStatus: false,
-      testnetFlag: network === 'testnet',
-      amount: amount.toString()
-    }]);
+    await prisma.transaction.create({
+      data: {
+        txid,
+        rawTx,
+        beefTx: transactionToObject(tx),
+        vout: outputs.map((output) => ({
+          address: toAddress,
+          satoshis: output.satoshis
+        })),
+        txType: 'outgoing',
+        spentStatus: false,
+        testnetFlag: network === 'testnet',
+        amount: BigInt(amount)
+      }
+    });
 
     return txid;
   } catch (error) {
@@ -163,5 +155,7 @@ export const createAndSendTransaction = async (
     throw new Error(
       `Transaction failed: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
+  } finally {
+    await prisma.$disconnect();
   }
 };
