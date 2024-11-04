@@ -7,6 +7,7 @@
     "knex": "knex"
   },
   "dependencies": {
+    "@bsv/sdk": "^1.1.30",
     "@clerk/nextjs": "^6.0.2",
     "@hookform/resolvers": "^3.9.0",
     "@neondatabase/serverless": "^0.9.4",
@@ -42,8 +43,9 @@
     "knex": "^3.1.0",
     "lucide-react": "^0.400.0",
     "next": "15.0.0-rc.1",
-    "next-auth": "5.0.0-beta.19",
+    "next-auth": "^5.0.0-beta.25",
     "next-themes": "^0.3.0",
+    "node-cron": "^3.0.3",
     "pg": "^8.13.1",
     "postcss": "^8.4.39",
     "prettier": "^3.3.2",
