@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
-import { db, users } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   const url = request.nextUrl.clone();
@@ -10,16 +10,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(url);
   }
   try {
-    await db.insert(users).values([
-      {
+    await prisma.user.create({
+      data: {
         userId: user.id,
         username: user.username,
         email: user.emailAddresses[0].emailAddress,
+        imageUrl: user.imageUrl,
         password: 'defaultPassword',
         role: 'user',
         theme: 'light'
       }
-    ]);
+    });
   } catch (error) {}
   return NextResponse.redirect(url);
 }
