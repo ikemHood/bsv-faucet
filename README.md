@@ -53,7 +53,6 @@ To successfully finish this guide, you'll need:
 
 - Node.js
 - A Vercel Account (to set up a free Postgres database and deploy the app)
-- A GitHub Account (to create an OAuth app)
 
 
 ## Getting Started
@@ -87,8 +86,7 @@ vercel env pull
 Finally, run the following commands to start the development server:
 
 ```sh
-pnpm install
-pnpm dev
+npm install
 ```
 
 You'll need the the following BSV Libraries:
