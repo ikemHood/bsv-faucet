@@ -12,7 +12,8 @@ import {
   serial,
   json,
   boolean,
-  varchar
+  varchar,
+  decimal,
 } from 'drizzle-orm/pg-core';
 import { count, eq, ilike } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
@@ -82,6 +83,28 @@ export async function getProducts(
   };
 }
 
+// Add treasury settings table
+export const treasurySettings = pgTable('treasury_settings', {
+  id: serial('id').primaryKey(),
+  lowBalanceThreshold: decimal('low_balance_threshold', { precision: 16, scale: 8 }).notNull().default('10'),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+});
+
+// Add treasury transactions table for history
+export const treasuryTransactions = pgTable('treasury_transactions', {
+  id: serial('id').primaryKey(),
+  amount: decimal('amount', { precision: 16, scale: 8 }).notNull(),
+  type: text('type').notNull(), // 'deposit' or 'withdrawal'
+  description: text('description'),
+  timestamp: timestamp('timestamp').notNull().defaultNow(),
+  balanceAfter: decimal('balance_after', { precision: 16, scale: 8 }).notNull()
+});
+
+// Export types
+export type TreasurySettings = typeof treasurySettings.$inferSelect;
+export type TreasuryTransaction = typeof treasuryTransactions.$inferSelect;
+
+
 export async function deleteProductById(id: number) {
   await db.delete(products).where(eq(products.id, id));
 }
@@ -95,7 +118,6 @@ export const transactions = pgTable('transactions', {
   spentStatus: boolean('spentStatus').notNull().default(false),
   testnetFlag: boolean('testnetFlag').notNull(),
   amount: numeric('amount', { precision: 20, scale: 0 }).notNull(),
-  fee: numeric('fee', { precision: 20, scale: 0 }),
 });
 
 export const wallets = pgTable('wallets', {
@@ -103,5 +125,4 @@ export const wallets = pgTable('wallets', {
   address: text('address').unique().notNull(),
   privateKey: text('privateKey').notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
-  balance: numeric('balance', { precision: 20, scale: 0 }).notNull().default('0'),
 });
