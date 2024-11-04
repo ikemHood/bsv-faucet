@@ -140,7 +140,7 @@ export const createAndSendTransaction = async (
           address: toAddress,
           satoshis: output.satoshis
         })),
-        txType: 'outgoing',
+        txType: 'withdraw',
         spentStatus: false,
         testnetFlag: network === 'testnet',
         amount: BigInt(amount)
