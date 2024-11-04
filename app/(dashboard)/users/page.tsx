@@ -28,7 +28,7 @@ const UsersPage = () => {
     console.log("Exporting users data...");
   };
 
-  const handleRowClick = (user) => {
+  const handleRowClick = (user: { user_id: string | number } ) => {
     window.open(`http://test.whatsonchain.com/${user.user_id}`, '_blank');
   };
 
