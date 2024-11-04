@@ -285,7 +285,9 @@
     "zod": "^3.23.8"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "next build",
+  "vercel-build": "next build"
   },
   "keywords": [],
   "author": "",
