@@ -28,20 +28,22 @@ const UsersPage = () => {
     console.log("Exporting users data...");
   };
 
-  const handleRowClick = (user) => {
+  const handleRowClick = (user: { user_id: string | number } ) => {
     window.open(`http://test.whatsonchain.com/${user.user_id}`, '_blank');
   };
 
-  const handlePauseAccount = async (userId, e) => {
+  const handlePauseAccount = async (userId: string | number, e: React.MouseEvent) => {
     e.stopPropagation();
     console.log(`Pause account for user ID: ${userId}`);
   };
 
-  const handleDeleteAccount = async (userId, e) => {
+  const handleDeleteAccount = async (userId: string | number, e: React.MouseEvent) => {
     e.stopPropagation();
     console.log(`Delete account for user ID: ${userId}`);
   };
 
+  // ShantelPeters to fix as per https://github.com/bitcoin-sv/bsv-faucet/pull/35 
+/*
   return (
     <Card className="w-full mx-auto">
       <CardHeader>
@@ -84,11 +86,15 @@ const UsersPage = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {users.map((user) => (
-                <tr
+            {users.map((user: User) => (
+                  <tr
                   key={user.id}
                   onClick={() => handleRowClick(user)}
                   className="hover:bg-gray-50 cursor-pointer transition-colors"
+                >
+                  </tr>
+            ))}
+                  
                 >
                   <td className="px-4 py-3 text-sm text-gray-900">{user.user_id}</td>
                   <td className="px-4 py-3 text-sm text-gray-900">{user.email}</td>
@@ -131,4 +137,6 @@ const UsersPage = () => {
   );
 };
 
+*/
+}
 export default UsersPage;

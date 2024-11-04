@@ -1,3 +1,7 @@
+// Commented out for ShantelPeters to Fix
+
+/*
+
 import { NextRequest, NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
 import { db, users } from '@/lib/db';
@@ -33,3 +37,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+  */
