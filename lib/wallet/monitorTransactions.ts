@@ -1,11 +1,11 @@
 import cron from 'node-cron';
-import { getUTXOs, getRawTransaction } from './regest';
+import { getUTXOs, getRawTransaction } from './regest'; // Make sure these functions are correctly implemented
 import { PrismaClient } from '@prisma/client';
 import { PrivateKey } from '@bsv/sdk';
 
 const prisma = new PrismaClient();
 
-const start = async () => {
+const startTransactionMonitor = async () => {
   const wallet = await prisma.wallet.findFirst();
   if (!wallet) throw new Error("Wallet not found");
 
@@ -38,7 +38,7 @@ const start = async () => {
                   satoshis: utxo.value,
                 },
               ],
-              txType: "incoming",
+              txType: "deposit",
               spentStatus: false,
               testnetFlag: true,
               amount: BigInt(utxo.value),
@@ -55,4 +55,6 @@ const start = async () => {
   cron.schedule('* * * * *', monitorIncomingTransactions);
 };
 
-start().catch(error => console.error("Error starting the monitor:", error));
+export const startMonitor = async () => {
+  await startTransactionMonitor().catch(error => console.error("Error starting the monitor:", error));
+};
