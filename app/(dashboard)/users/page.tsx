@@ -42,6 +42,8 @@ const UsersPage = () => {
     console.log(`Delete account for user ID: ${userId}`);
   };
 
+  // ShantelPeters to fix as per https://github.com/bitcoin-sv/bsv-faucet/pull/35 
+/*
   return (
     <Card className="w-full mx-auto">
       <CardHeader>
@@ -84,11 +86,15 @@ const UsersPage = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {users.map((user) => (
-                <tr
+            {users.map((user: User) => (
+                  <tr
                   key={user.id}
                   onClick={() => handleRowClick(user)}
                   className="hover:bg-gray-50 cursor-pointer transition-colors"
+                >
+                  </tr>
+            ))}
+                  
                 >
                   <td className="px-4 py-3 text-sm text-gray-900">{user.user_id}</td>
                   <td className="px-4 py-3 text-sm text-gray-900">{user.email}</td>
@@ -131,4 +137,6 @@ const UsersPage = () => {
   );
 };
 
+*/
+}
 export default UsersPage;
