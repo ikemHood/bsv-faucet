@@ -4,7 +4,7 @@ Create an open-source faucet service offering small amounts of digital tokens fo
 
 A testnet faucet provides users with free testnet tokens for testing and development. This allows developers to test their applications and smart contracts before deploying them to the main network.
 
-## Introduction 
+## Introduction
 
 Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bitcoin, focusing on scalability, security, and stability. This list gathers various resources to help you explore, develop, and contribute to the BSV ecosystem.
 
