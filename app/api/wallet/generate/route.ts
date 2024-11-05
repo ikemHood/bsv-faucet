@@ -3,10 +3,10 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const wallet = await generateWallet();
+    const wallet = generateWallet();
     return NextResponse.json({
-      walletId: wallet.walletId,
-      testnetAddress: wallet.testnetAddress
+      walletId: (await wallet).walletId,
+      testnetAddress: (await wallet).testnetAddress
     });
   } catch (error) {
     console.error('Failed to generate wallet:', error);

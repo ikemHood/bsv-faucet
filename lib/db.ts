@@ -1,4 +1,4 @@
-// import 'server-only';
+import 'server-only';
 
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
@@ -18,11 +18,10 @@ import {
 import { count, eq, ilike } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 
-export const db = drizzle(neon(process.env.NEXT_PUBLIC_POSTGRES_URL!));
+export const db = drizzle(neon(process.env.POSTGRES_URL!));
 
 export const roleEnum = pgEnum('role', ['user', 'admin']);
 export const themesEnum = pgEnum('theme', ['light', 'dark']);
-
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   username: varchar('username', { length: 255 }).notNull(),
