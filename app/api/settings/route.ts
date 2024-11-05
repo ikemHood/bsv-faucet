@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
-import { db, users } from '@/lib/db';
-import { eq } from 'drizzle-orm';
+import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
 
@@ -35,11 +34,9 @@ export async function POST(request: NextRequest) {
     const data = await request.json();
     const { currentPassword, newPassword } = ChangePasswordSchema.parse(data);
 
-    const [userRecord] = await db
-      .select()
-      .from(users)
-      .where(eq(users.userId, user.id))
-      .limit(1);
+    const userRecord = await prisma.user.findUnique({
+      where: { userId: user.id }
+    });
 
     if (!userRecord) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -59,11 +56,10 @@ export async function POST(request: NextRequest) {
     const saltRounds = 10;
     const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
 
-    await db
-      .update(users)
-      .set({ password: hashedNewPassword })
-      .where(eq(users.userId, user.id))
-      .execute();
+    await prisma.user.update({
+      where: { userId: user.id },
+      data: { password: hashedNewPassword }
+    });
 
     return NextResponse.json({ message: 'Password updated successfully' });
   } catch (error) {
@@ -96,11 +92,10 @@ export async function PUT(request: NextRequest) {
     const validatedData = UpdateUserSchema.parse(data);
 
     // Update user data in the database
-    await db
-      .update(users)
-      .set(validatedData)
-      .where(eq(users.userId, user.id))
-      .execute();
+    await prisma.user.update({
+      where: { userId: user.id },
+      data: validatedData
+    });
 
     // Return the updated data
     return NextResponse.json({
@@ -135,17 +130,9 @@ export async function GET(request: NextRequest) {
   try {
     console.log('Fetching user data for userId:', user.id); // Log user ID
 
-    const [userData] = await db
-      .select({
-        id: users.id,
-        username: users.username,
-        email: users.email,
-        theme: users.theme,
-        role: users.role
-      })
-      .from(users)
-      .where(eq(users.userId, user.id))
-      .limit(1);
+    const userData = await prisma.user.findUnique({
+      where: { userId: user.id }
+    });
 
     if (!userData) {
       console.warn('User not found in database for userId:', user.id);
@@ -177,11 +164,10 @@ export async function PATCH(request: NextRequest) {
     const data = await request.json();
     const validatedData = UpdateThemeSchema.parse(data);
 
-    await db
-      .update(users)
-      .set({ theme: validatedData.theme })
-      .where(eq(users.userId, user.id))
-      .execute();
+    await prisma.user.update({
+      where: { userId: user.id },
+      data: { theme: validatedData.theme }
+    });
 
     return NextResponse.json({ message: 'Theme updated successfully' });
   } catch (error) {
@@ -211,11 +197,9 @@ export async function DELETE(request: NextRequest) {
     const data = await request.json();
     const { password } = DeleteAccountSchema.parse(data);
 
-    const [userRecord] = await db
-      .select()
-      .from(users)
-      .where(eq(users.userId, user.id))
-      .limit(1);
+    const userRecord = await prisma.user.findUnique({
+      where: { userId: user.id }
+    });
 
     if (!userRecord) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -229,7 +213,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    await db.delete(users).where(eq(users.userId, user.id)).execute();
+    await prisma.user.delete({ where: { userId: user.id } });
 
     return NextResponse.json({ message: 'Account deleted successfully' });
   } catch (error) {
