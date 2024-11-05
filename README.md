@@ -8,7 +8,7 @@ A testnet faucet provides users with free testnet tokens for testing and develop
 
 Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bitcoin, focusing on scalability, security, and stability. This list gathers various resources to help you explore, develop, and contribute to the BSV ecosystem.
 
-## **Getting Started**
+## **Getting Started** 
 
 - [Getting Started with Bitcoin testnet](https://docs.bsvblockchain.org/network-topology/nodes/sv-node/installation/sv-node/network-environments/testnet)
 - [System Requirements](https://docs.bsvblockchain.org/network-topology/nodes/sv-node/system-requirements)
@@ -53,7 +53,6 @@ To successfully finish this guide, you'll need:
 
 - Node.js
 - A Vercel Account (to set up a free Postgres database and deploy the app)
-- A GitHub Account (to create an OAuth app)
 
 
 ## Getting Started
@@ -74,9 +73,9 @@ CREATE TABLE products (
   available_at TIMESTAMP NOT NULL
 );
 ```
-Then, uncomment app/api/seed.ts and hit http://localhost:3000/api/seed to seed the database with products.
+Then, uncomment app/api/seed.ts and hit http://localhost:3000/api/seed to seed the database
 
-Next, copy the .env.example file to .env and update the values. Follow the instructions in the .env.example file to set up your GitHub OAuth application.
+Next, copy the .env.example file to .env and update the values. Follow the instructions in the .env.example file to set up your env variables.
 
 ```sh
 npm i -g vercel
@@ -87,14 +86,12 @@ vercel env pull
 Finally, run the following commands to start the development server:
 
 ```sh
-pnpm install
-pnpm dev
+npm install
 ```
 
 You'll need the the following BSV Libraries:
 ```sh
 npm i @bsv/sdk
-npm i @bsv/paymail
 ```
 
 You should now be able to access the application at http://localhost:3000.
@@ -148,10 +145,25 @@ bash
 npx knex migrate:latest
 ```
 
+## Error running the migrations
+
+In case you encounter an error during the migration process, do the following steps:
+
+1. Run the following command to source the env variables:
+
+```sh
+source .env
+```
+2. Run the migration scripts again
+
+3. If this doesn't work, run the following command:
+
+```sh
+POSTGRES_URL="..." pnpm knex migrate:latest
+```
+
 This will apply all pending migrations to your local database. You can revert changes using:
 ```sh
-bash
-
 npx knex migrate:rollback
 ```
 

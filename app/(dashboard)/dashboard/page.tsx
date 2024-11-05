@@ -8,6 +8,8 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
+import { fetchUser, fetchTransactions } from '@/lib/prisma';
+import LatestTransactionsTable from '../latest-transactions-table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {

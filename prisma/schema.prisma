@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  userId       String        @unique
+  username     String        @unique
+  email        String        @unique
+  imageUrl     String        @default("/placeholder-user.jpg")
+  role         Role
+  password     String
+  theme        Theme         @default(light)
+  transactions Transaction[]
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  date        DateTime @default(now())
+  txid        String   @unique
+  rawTx       Json?
+  beefTx      Json
+  vout        Json
+  txType      String
+  spentStatus Boolean  @default(false)
+  testnetFlag Boolean  @default(true)
+  amount      BigInt
+  userId      Int?
+  user        User?    @relation(fields: [userId], references: [id])
+}
+
+model Wallet {
+  id         Int      @id @default(autoincrement())
+  address    String   @unique
+  privateKey String
+  createdAt  DateTime @default(now())
+}
+
+enum Role {
+  user
+  admin
+}
+
+enum Theme {
+  light
+  dark
+}
