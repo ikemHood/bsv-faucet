@@ -1,4 +1,4 @@
-import { User, TransactionWithUser } from '@/lib/prisma';
+import { User, TransactionWithUser, Transaction } from '@/lib/prisma';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -25,15 +25,15 @@ const LatestTransactionsTableRow = ({
     </TableCell>
     {user.role === 'admin' && (
       <TableCell>
-        {transaction.user && (
+        {transaction?.user && (
           <div className="flex items-center gap-2">
             <Avatar>
-              <AvatarImage src={transaction.user.imageUrl} />
-              <AvatarFallback>{transaction.user.username}</AvatarFallback>
+              <AvatarImage src={transaction?.user?.imageUrl} />
+              <AvatarFallback>{transaction?.user?.username}</AvatarFallback>
             </Avatar>
             <div className="flex justify-start flex-col">
-              <span>{transaction.user.username}</span>
-              <span>{transaction.user.email}</span>
+              <span>{transaction?.user?.username}</span>
+              <span>{transaction?.user?.email}</span>
             </div>
           </div>
         )}

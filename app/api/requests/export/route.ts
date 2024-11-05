@@ -1,4 +1,4 @@
-import { fetchUser, fetchTransactions } from '@/lib/prisma';
+import { fetchUser, fetchTransactions, TransactionWithUser } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { stringify as csvStringifySync } from 'csv-stringify/sync';
 
@@ -12,7 +12,7 @@ export async function GET() {
       statusText: 'Unauthorized'
     });
   }
-  const transactions = await fetchTransactions(user);
+  const transactions = (await fetchTransactions(user)) as TransactionWithUser[];
   const transactionsCsv = transactions.map((transaction) => {
     const result: Record<string, any> = {};
     result['Tx ID'] = transaction.txid;

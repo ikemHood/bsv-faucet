@@ -1,4 +1,4 @@
-import { User, TransactionWithUser } from '@/lib/prisma';
+import { User, TransactionWithUser, Transaction } from '@/lib/prisma';
 import {
   Table,
   TableBody,
@@ -13,7 +13,7 @@ const LatestTransactionsTable = ({
   transactions
 }: {
   user: User;
-  transactions: TransactionWithUser[];
+  transactions: (TransactionWithUser | Transaction)[];
 }) => (
   <Table className="overflow-x-auto">
     <TableHeader>
@@ -32,7 +32,7 @@ const LatestTransactionsTable = ({
         <LatestTransactionsTableRow
           key={transaction.txid}
           user={user}
-          transaction={transaction}
+          transaction={transaction as TransactionWithUser}
         />
       ))}
     </TableBody>

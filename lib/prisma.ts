@@ -29,7 +29,7 @@ export const fetchUser = async () => {
   });
 };
 
-export const fetchTransactions = async (user: User, take?: number) => {
+export const fetchTransactions = async (user: User, take?: number): Promise<TransactionWithUser[] | Transaction[]> => {
   const transactions = await prisma.transaction.findMany({
     where: user.role === 'admin' ? {} : { userId: user.id },
     include: { user: true },
