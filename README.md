@@ -8,7 +8,7 @@ A testnet faucet provides users with free testnet tokens for testing and develop
 
 Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bitcoin, focusing on scalability, security, and stability. This list gathers various resources to help you explore, develop, and contribute to the BSV ecosystem.
 
-## **Getting Started**
+## **Getting Started** 
 
 - [Getting Started with Bitcoin testnet](https://docs.bsvblockchain.org/network-topology/nodes/sv-node/installation/sv-node/network-environments/testnet)
 - [System Requirements](https://docs.bsvblockchain.org/network-topology/nodes/sv-node/system-requirements)
@@ -53,7 +53,6 @@ To successfully finish this guide, you'll need:
 
 - Node.js
 - A Vercel Account (to set up a free Postgres database and deploy the app)
-- A GitHub Account (to create an OAuth app)
 
 
 ## Getting Started
@@ -87,8 +86,7 @@ vercel env pull
 Finally, run the following commands to start the development server:
 
 ```sh
-pnpm install
-pnpm dev
+npm install
 ```
 
 You'll need the the following BSV Libraries:

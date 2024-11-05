@@ -1,5 +1,7 @@
 import { PrivateKey } from '@bsv/sdk';
-import { db, wallets } from '../db';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export const generateWallet = async () => {
   try {
@@ -8,16 +10,13 @@ export const generateWallet = async () => {
     const publicKey = privateKey.toPublicKey();
     const testnetAddress = publicKey.toAddress([0x6f]).toString();
 
-    const [newWallet] = await db
-      .insert(wallets)
-      .values({
+    const newWallet = await prisma.wallet.create({
+      data: {
         address: testnetAddress,
         privateKey: wif,
-        balance: '0',
-        createdAt: new Date(),
-        lastUpdated: new Date()
-      })
-      .returning();
+        createdAt: new Date()
+      }
+    });
 
     return {
       testnetAddress,
@@ -25,6 +24,10 @@ export const generateWallet = async () => {
     };
   } catch (error) {
     console.error('Failed to generate and store wallet:', error);
-    throw new Error(`Failed to create wallet: ${error}`);
+    throw new Error(
+      `Failed to create wallet: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  } finally {
+    await prisma.$disconnect();
   }
 };
