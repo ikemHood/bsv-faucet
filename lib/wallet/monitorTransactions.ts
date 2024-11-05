@@ -1,5 +1,5 @@
 import cron from 'node-cron';
-import { getUTXOs, getRawTransaction } from './regest'; // Make sure these functions are correctly implemented
+import { getUTXOs, getRawTransaction } from './regest';
 import { PrismaClient } from '@prisma/client';
 import { PrivateKey } from '@bsv/sdk';
 
@@ -51,7 +51,7 @@ const startTransactionMonitor = async () => {
       console.error("Error monitoring incoming transactions:", error);
     }
   };
-
+  monitorIncomingTransactions()
   cron.schedule('* * * * *', monitorIncomingTransactions);
 };
 

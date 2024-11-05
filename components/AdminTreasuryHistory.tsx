@@ -8,15 +8,14 @@ import { Alert, AlertTitle, AlertDescription } from './ui/alert'
 import { FileWarningIcon, RefreshCcwIcon } from 'lucide-react'
 
 async function getDepositHistory(): Promise<DepositTransaction[]> {
-  const res = await fetch('/api/deposit-history', { cache: 'no-store' })
+  const res = await fetch('http://localhost:3001/api/deposit-history', { cache: 'no-store' })
   if (!res.ok) {
-    console.error('Failed to fetch deposit history', res);
     throw new Error('Failed to fetch deposit history')
   }
   return res.json()
 }
 
-export function DepositHistoryTable({ depositHistory }: { depositHistory: DepositTransaction[] }) {
+function DepositHistoryTable({ depositHistory }: { depositHistory: DepositTransaction[] }) {
   return (
     <Table>
       <TableHeader>
@@ -45,7 +44,7 @@ export function DepositHistoryTable({ depositHistory }: { depositHistory: Deposi
   )
 }
 
-export function LoadingState() {
+function LoadingState() {
   return (
     <div className="space-y-3">
       <Skeleton className="h-4 w-[250px]" />
