@@ -6,7 +6,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from '@/components/ui/card';
 import { fetchUser, fetchTransactions } from '@/lib/prisma';
 import LatestTransactionsTable from '../latest-transactions-table';
@@ -18,7 +18,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from '@/components/ui/table';
 import { Timer, Wallet, History, AlertTriangle } from 'lucide-react';
 import { createAndSendTransaction } from '@/lib/wallet/transactions';
@@ -42,7 +42,7 @@ export default function DashboardPage() {
   }
 
   const [recentHistory, setRecentHistory] = useState<RequestHistory[]>([]);
-  const RECAPTCHA_SITE_KEY = "6LfiVHAqAAAAAIwIb6lwozLfIkahe2HiFFgGyVBN";
+  const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
   useEffect(() => {
     setRecentHistory([
@@ -51,8 +51,8 @@ export default function DashboardPage() {
         date: new Date().toISOString(),
         amount: 50000000,
         status: 'Completed',
-        txId: '1234567890abcdef'
-      }
+        txId: '1234567890abcdef',
+      },
     ]);
 
     const timeLeft = localStorage.getItem('nextRequestTime');
@@ -61,7 +61,8 @@ export default function DashboardPage() {
     }
   }, []);
 
-  const isValidBSVAddress = (addr: string) => /^[mn2][a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(addr);
+  const isValidBSVAddress = (addr: string) =>
+    /^[mn2][a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(addr);
 
   const validateForm = () => {
     if (!isValidBSVAddress(address)) return 'Invalid BSV testnet address';
@@ -83,8 +84,10 @@ export default function DashboardPage() {
 
     try {
       const amountInSatoshis = parseInt(amount);
-      const privKeyWif = process.env.NEXT_PUBLIC_PRIVATE_KEY_WIF || 'L3zd4gcFAjxr36hwfoWEPGyuNyCCV3g54Sr4RCy8Lmt4wGjHae3k';
-      
+      const privKeyWif =
+        process.env.NEXT_PUBLIC_PRIVATE_KEY_WIF ||
+        'L3zd4gcFAjxr36hwfoWEPGyuNyCCV3g54Sr4RCy8Lmt4wGjHae3k';
+
       // Use the imported transaction function
       const txid = await createAndSendTransaction(
         privKeyWif,
@@ -94,27 +97,30 @@ export default function DashboardPage() {
       );
 
       // Update UI state
-      setSuccess(`Successfully sent ${amount} satoshis to ${address}. TxID: ${txid}`);
+      setSuccess(
+        `Successfully sent ${amount} satoshis to ${address}. TxID: ${txid}`
+      );
       setTotalRequested((prev) => prev + amountInSatoshis);
       setFaucetBalance((prev) => prev - amountInSatoshis);
 
       // Update transaction history
-      setRecentHistory((prev) => [
-        {
-          id: Date.now(),
-          date: new Date().toISOString(),
-          amount: amountInSatoshis,
-          status: 'Completed',
-          txId: txid
-        },
-        ...prev
-      ].slice(0, 5));
+      setRecentHistory((prev) =>
+        [
+          {
+            id: Date.now(),
+            date: new Date().toISOString(),
+            amount: amountInSatoshis,
+            status: 'Completed',
+            txId: txid,
+          },
+          ...prev,
+        ].slice(0, 5)
+      );
 
       // Set cooldown period
       const nextRequestTime = Date.now() + 24 * 60 * 60 * 1000;
       localStorage.setItem('nextRequestTime', nextRequestTime.toString());
       setRemainingTime(24 * 60 * 60 * 1000);
-
     } catch (err: any) {
       setError(`Failed to process request: ${err.message}`);
       console.error('Transaction error:', err);
@@ -139,33 +145,33 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="space-y-4">
+    <div className='space-y-4'>
       <Card>
         <CardHeader>
           <CardTitle>BSV Testnet Faucet</CardTitle>
           <CardDescription>Request testnet BSV tokens</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
-            <div className="flex items-center space-x-2">
-              <Wallet className="h-5 w-5" />
+        <CardContent className='space-y-4'>
+          <div className='flex items-center justify-between p-4 bg-secondary rounded-lg'>
+            <div className='flex items-center space-x-2'>
+              <Wallet className='h-5 w-5' />
               <span>Faucet Balance:</span>
             </div>
-            <span className="font-bold">{faucetBalance} satoshis</span>
+            <span className='font-bold'>{faucetBalance} satoshis</span>
           </div>
 
-          <div className="space-y-4">
+          <div className='space-y-4'>
             <Input
-              placeholder="Enter BSV testnet address"
+              placeholder='Enter BSV testnet address'
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             />
             <Input
-              type="number"
-              placeholder="Amount (in satoshis, max 100,000,000)"
+              type='number'
+              placeholder='Amount (in satoshis, max 100,000,000)'
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              max="100000000"
+              max='100000000'
             />
 
             <ReCAPTCHA
@@ -174,14 +180,17 @@ export default function DashboardPage() {
             />
 
             {remainingTime > 0 && (
-              <div className="flex items-center space-x-2 text-yellow-600">
-                <Timer className="h-5 w-5" />
-                <span>Next request available in: {formatTimeRemaining(remainingTime)}</span>
+              <div className='flex items-center space-x-2 text-yellow-600'>
+                <Timer className='h-5 w-5' />
+                <span>
+                  Next request available in:{' '}
+                  {formatTimeRemaining(remainingTime)}
+                </span>
               </div>
             )}
 
             <Button
-              className="w-full"
+              className='w-full'
               onClick={handleRequest}
               disabled={remainingTime > 0}
             >
@@ -190,14 +199,14 @@ export default function DashboardPage() {
           </div>
 
           {error && (
-            <p className="text-red-500" role="alert">
-              <AlertTriangle className="inline h-4 w-4 mr-2" />
+            <p className='text-red-500' role='alert'>
+              <AlertTriangle className='inline h-4 w-4 mr-2' />
               {error}
             </p>
           )}
           {success && (
-            <p className="text-green-500" role="status">
-              <History className="inline h-4 w-4 mr-2" />
+            <p className='text-green-500' role='status'>
+              <History className='inline h-4 w-4 mr-2' />
               {success}
             </p>
           )}
@@ -230,9 +239,9 @@ export default function DashboardPage() {
                   <TableCell>
                     <a
                       href={`https://test.whatsonchain.com/tx/${request.txId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='text-blue-500 hover:underline'
                       title={`View Transaction ${request.txId}`}
                     >
                       {request.txId.substring(0, 8)}...
