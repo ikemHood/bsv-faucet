@@ -28,7 +28,7 @@ const LatestTransactionsTableRow = ({
         {transaction.user && (
           <div className="flex items-center gap-2">
             <Avatar>
-              <AvatarImage src={transaction.user?.imageUrl} />
+              <AvatarImage src={transaction.user.imageUrl} />
               <AvatarFallback>{transaction.user.username}</AvatarFallback>
             </Avatar>
             <div className="flex justify-start flex-col">
