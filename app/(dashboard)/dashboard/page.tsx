@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { PrivateKey, P2PKH, Transaction, ARC } from '@bsv/sdk'
 import ReCAPTCHA from 'react-google-recaptcha';
 import {
   Card,
@@ -20,15 +19,18 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Timer, Wallet, History, AlertTriangle } from 'lucide-react';
+import { createAndSendTransaction } from '@/lib/wallet/transactions';
 
 export default function DashboardPage() {
-  // State management
   const [address, setAddress] = useState('');
   const [amount, setAmount] = useState('');
   const [captchaValue, setCaptchaValue] = useState('');
   const [remainingTime, setRemainingTime] = useState(0);
   const [totalRequested, setTotalRequested] = useState(0);
   const [faucetBalance, setFaucetBalance] = useState(100000000); // 1 BSV in satoshis
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
   interface RequestHistory {
     id: number;
     date: string;
@@ -36,11 +38,8 @@ export default function DashboardPage() {
     status: string;
     txId: string;
   }
-  
-  const [recentHistory, setRecentHistory] = useState<RequestHistory[]>([]);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
+  const [recentHistory, setRecentHistory] = useState<RequestHistory[]>([]);
   const RECAPTCHA_SITE_KEY = "6LfiVHAqAAAAAIwIb6lwozLfIkahe2HiFFgGyVBN";
 
   useEffect(() => {
@@ -60,15 +59,7 @@ export default function DashboardPage() {
     }
   }, []);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setRemainingTime((prev) => Math.max(0, prev - 1000));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const isValidBSVAddress = (addr: any) =>
-    /^[mn2][a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(addr);
+  const isValidBSVAddress = (addr: string) => /^[mn2][a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(addr);
 
   const validateForm = () => {
     if (!isValidBSVAddress(address)) return 'Invalid BSV testnet address';
@@ -79,11 +70,6 @@ export default function DashboardPage() {
     return null;
   };
 
-  const onCaptchaChange = (value: string | null) => {
-    setCaptchaValue(value || '');
-  };
-
-
   const handleRequest = async () => {
     setError('');
     setSuccess('');
@@ -92,93 +78,63 @@ export default function DashboardPage() {
       setError(validationError);
       return;
     }
-  
+
     try {
       const amountInSatoshis = parseInt(amount);
-  
-      const privKey = PrivateKey.fromWif('YOUR_PRIVATE_KEY_HERE');
-  
-      const tx = new Transaction();
+      const privKeyWif = process.env.NEXT_PUBLIC_PRIVATE_KEY_WIF || 'L3zd4gcFAjxr36hwfoWEPGyuNyCCV3g54Sr4RCy8Lmt4wGjHae3k';
       
-      const utxo = {
-        txid: 'YOUR_UTXO_TXID',
-        vout: 0,
-        satoshis: 1000000,
-        script: 'YOUR_UTXO_SCRIPT'
-      };
-  
-      tx.addInput({
-        txid: utxo.txid,
-        vout: utxo.vout,
-        script: utxo.script,
-        satoshis: utxo.satoshis
-      });
-  
-      tx.addOutput({
-        to: address,
-        satoshis: amountInSatoshis
-      });
-  
-      const fee = 500;
-      const change = utxo.satoshis - amountInSatoshis - fee;
-      if (change > 546) {
-        tx.addOutput({
-          to: 'YOUR_CHANGE_ADDRESS',
-          satoshis: change
-        });
-      }
-  
-      tx.sign(privKey);
-  
-      const apiKey = 'mainnet_186a49c33a232579e5750b2075e569b0';
-      const response = await tx.broadcast(new ARC('https://api.taal.com/arc', apiKey));
-  
-      if (response.ok) {
-        setSuccess(
-          `Successfully sent ${amount} satoshis to ${address}. TxID: ${response.txid}`
-        );
-        setTotalRequested((prev) => prev + amountInSatoshis);
-        setFaucetBalance((prev) => prev - amountInSatoshis);
-        
-        setRecentHistory((prev) =>
-          [
-            {
-              id: Date.now(),
-              date: new Date().toISOString(),
-              amount: amountInSatoshis,
-              status: 'Completed',
-              txId: response.txid
-            },
-            ...prev
-          ].slice(0, 5)
-        );
-  
-        const nextRequestTime = Date.now() + 24 * 60 * 60 * 1000;
-        localStorage.setItem('nextRequestTime', nextRequestTime.toString());
-        setRemainingTime(24 * 60 * 60 * 1000);
-      } else {
-        throw new Error('Transaction broadcast failed');
-      }
-    } catch (err) {
-      setError('Failed to process request. Please try again.');
-      console.error(err);
+      // Use the imported transaction function
+      const txid = await createAndSendTransaction(
+        privKeyWif,
+        address,
+        amountInSatoshis,
+        'testnet'
+      );
+
+      // Update UI state
+      setSuccess(`Successfully sent ${amount} satoshis to ${address}. TxID: ${txid}`);
+      setTotalRequested((prev) => prev + amountInSatoshis);
+      setFaucetBalance((prev) => prev - amountInSatoshis);
+
+      // Update transaction history
+      setRecentHistory((prev) => [
+        {
+          id: Date.now(),
+          date: new Date().toISOString(),
+          amount: amountInSatoshis,
+          status: 'Completed',
+          txId: txid
+        },
+        ...prev
+      ].slice(0, 5));
+
+      // Set cooldown period
+      const nextRequestTime = Date.now() + 24 * 60 * 60 * 1000;
+      localStorage.setItem('nextRequestTime', nextRequestTime.toString());
+      setRemainingTime(24 * 60 * 60 * 1000);
+
+    } catch (err: any) {
+      setError(`Failed to process request: ${err.message}`);
+      console.error('Transaction error:', err);
     }
   };
 
-  useEffect(() => {
-    if (remainingTime > 0) {
-      const timer = setInterval(() => {
-        setRemainingTime((prev) => Math.max(0, prev - 1000));
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [remainingTime]);
+  const onCaptchaChange = (value: string | null) => {
+    setCaptchaValue(value || '');
+  };
 
-  const formatTimeRemaining = (time: any) => {
+  const formatTimeRemaining = (time: number) => {
     const hours = Math.floor(time / (60 * 60 * 1000));
     const minutes = Math.floor((time % (60 * 60 * 1000)) / (60 * 1000));
     return `${hours}h ${minutes}m`;
   };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setRemainingTime((prev) => Math.max(0, prev - 1000));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -277,7 +233,7 @@ export default function DashboardPage() {
                       className="text-blue-500 hover:underline"
                       title={`View Transaction ${request.txId}`}
                     >
-                      {request.txId}...
+                      {request.txId.substring(0, 8)}...
                     </a>
                   </TableCell>
                 </TableRow>
