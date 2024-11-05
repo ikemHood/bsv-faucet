@@ -293,6 +293,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev  --turbo",
+    "start": "next start",
     "vercel-build": "prisma generate && next build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
