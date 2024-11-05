@@ -301,6 +301,7 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/node-cron": "^3.0.11",
-    "@types/react": "18.3.12"
+    "@types/react": "18.3.12",
+    "@types/react-google-recaptcha": "^2.1.9"
   }
 }
