@@ -22,8 +22,11 @@ import {
 } from '@/components/ui/table';
 import { Timer, Wallet, History, AlertTriangle } from 'lucide-react';
 import { createAndSendTransaction } from '@/lib/wallet/transactions';
+import { toast } from '@/hooks/use-toast';
+import { useDonation } from '@/hooks/useDonation';
 
 export default function DashboardPage() {
+  const { adminWallet } = useDonation();
   const [address, setAddress] = useState('');
   const [amount, setAmount] = useState('');
   const [captchaValue, setCaptchaValue] = useState('');
@@ -174,10 +177,10 @@ export default function DashboardPage() {
               max='100000000'
             />
 
-            <ReCAPTCHA
+            {/* <ReCAPTCHA
               sitekey={RECAPTCHA_SITE_KEY}
               onChange={onCaptchaChange}
-            />
+            /> */}
 
             {remainingTime > 0 && (
               <div className='flex items-center space-x-2 text-yellow-600'>
@@ -219,6 +222,28 @@ export default function DashboardPage() {
           <CardDescription>Your last 5 requests</CardDescription>
         </CardHeader>
         <CardContent></CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Donate to Faucet</CardTitle>
+          <CardDescription>Donate unused BSV back to the Faucet.</CardDescription>
+        </CardHeader>
+        <CardContent className='h-full w-full flex items-center'>
+          <div className="p-4 rounded-lg">
+            <div className="text-sm font-medium">Fuacet Address</div>
+            <p className='text-sm text-muted-foreground'> click to copy address, send unused BSV back to faucet address</p>
+            <div className="text-xl text-center bg-secondary rounded-lg p-2 font-semibold" onClick={() => {
+              navigator.clipboard.writeText(adminWallet?.address || '');
+              toast({
+                title: 'Copied to clipboard',
+                description: `Fuacet address copied to clipboard`
+              });
+            }}>
+              {adminWallet?.address}
+            </div>
+          </div>
+        </CardContent>
       </Card>
     </div>
   );

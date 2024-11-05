@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Card,
   CardContent,
@@ -21,8 +23,7 @@ export default function DashboardPage() {
             </Button>
           </div>
         <CardDescription>Dashboard items.</CardDescription>
-      </CardHeader>
-      <CardContent>
+      </CardHeader><CardContent>
       </CardContent>
     </Card>
   );

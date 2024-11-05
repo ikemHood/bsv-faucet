@@ -1,3 +1,5 @@
+"use client"
+
 import AdminTreasuryHistory from '@/components/adminTreasuryHistory/AdminTreasuryHistory';
 import TreasuryDepositHistory from '@/components/adminTreasuryHistory/TreasuryDepositHistory';
 import {
