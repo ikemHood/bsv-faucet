@@ -22,6 +22,8 @@ import {
 } from '@/components/ui/table';
 import { Timer, Wallet, History, AlertTriangle } from 'lucide-react';
 import { createAndSendTransaction } from '@/lib/wallet/transactions';
+import { toast } from '@/hooks/use-toast';
+import { AdminWalletAddress } from '@/lib/utils';
 
 export default function DashboardPage() {
   const [address, setAddress] = useState('');
@@ -251,6 +253,28 @@ export default function DashboardPage() {
               ))}
             </TableBody>
           </Table>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Donate to Faucet</CardTitle>
+          <CardDescription>Donate unused BSV back to the Faucet.</CardDescription>
+        </CardHeader>
+        <CardContent className='h-full w-full flex items-center'>
+          <div className="p-4 rounded-lg">
+            <div className="text-sm font-medium">Fuacet Address</div>
+            <p className='text-sm text-muted-foreground'> click to copy address, send unused BSV back to faucet address</p>
+            <div className="text-xl text-center bg-secondary rounded-lg p-2 px-4 font-semibold" onClick={() => {
+              navigator.clipboard.writeText(AdminWalletAddress);
+              toast({
+                title: 'Copied to clipboard',
+                description: `Fuacet address copied to clipboard`
+              });
+            }}>
+              {AdminWalletAddress}
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
