@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@/prisma/generated/client';
 
 const prisma = new PrismaClient();
 
@@ -7,11 +7,11 @@ export async function GET() {
   try {
     const transactions = await prisma.transaction.findMany({
       orderBy: {
-        date: 'desc',
-      },
+        date: 'desc'
+      }
     });
 
-    const serializableTransactions = transactions.map(transaction => ({
+    const serializableTransactions = transactions.map((transaction) => ({
       id: transaction.id,
       txid: transaction.txid,
       rawTx: transaction.rawTx,
@@ -21,7 +21,7 @@ export async function GET() {
       spentStatus: transaction.spentStatus,
       testnetFlag: transaction.testnetFlag,
       amount: transaction.amount.toString(),
-      date: transaction.date.toISOString(),
+      date: transaction.date.toISOString()
     }));
 
     return NextResponse.json(serializableTransactions);

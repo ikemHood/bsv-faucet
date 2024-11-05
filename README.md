@@ -8,11 +8,11 @@ A testnet faucet provides users with free testnet tokens for testing and develop
 
 Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bitcoin, focusing on scalability, security, and stability. This list gathers various resources to help you explore, develop, and contribute to the BSV ecosystem.
 
-## **Getting Started** 
+## **Getting Started**
 
 - [Getting Started with Bitcoin testnet](https://docs.bsvblockchain.org/network-topology/nodes/sv-node/installation/sv-node/network-environments/testnet)
 - [System Requirements](https://docs.bsvblockchain.org/network-topology/nodes/sv-node/system-requirements)
-  
+
 #### BSV Quick Start
 
 - [Quick Start](https://docs.bsvblockchain.org/intro/quick-start)
@@ -26,7 +26,6 @@ Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bi
 - [BSV Wiki](https://wiki.bitcoinsv.io/) – Aim to provide correct and up-to-date information on the Bitcoin protocol, network, and its features and functionality.
 - [Paymail](https://tsc.bsvblockchain.org/standards/paymail/) – A collection of protocols for BSV blockchain wallets that allow for a set of simplified user experiences to be delivered across all wallets in the ecosystem.
 
-
 #### BSV Development Libraries
 
 - [Official BSV SDK](https://github.com/bitcoin-sv/ts-sdk) maintained by the BSV Association with zero dependencies.
@@ -36,8 +35,9 @@ Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bi
 
 - Framework - Next.js (App Router)
 - Language - TypeScript
-- Auth - Auth.js
+- Auth - Clerk
 - Database - Postgres
+- ORM - Prisma
 - Deployment - Vercel
 - Styling - Tailwind CSS
 - Components - Shadcn UI
@@ -46,36 +46,19 @@ Bitcoin SV (BSV) is a blockchain that aims to maintain the original vision of Bi
 
 This uses the new Next.js App Router. This includes support for enhanced layouts, colocation of components, tests, and styles, component-level data fetching, and more.
 
-
 ## Pre-requisites
 
 To successfully finish this guide, you'll need:
 
-- Node.js
+- Node.js >= 22
+- pnpm >= 9
 - A Vercel Account (to set up a free Postgres database and deploy the app)
 
-
 ## Getting Started
+
 During the deployment, Vercel will prompt you to create a new Postgres database. This will add the necessary environment variables to your project.
 
-Inside the Vercel Postgres dashboard, create a table based on the schema defined in this repository.
-
-```sh
-CREATE TYPE status AS ENUM ('active', 'inactive', 'archived');
-
-CREATE TABLE products (
-  id SERIAL PRIMARY KEY,
-  image_url TEXT NOT NULL,
-  name TEXT NOT NULL,
-  status status NOT NULL,
-  price NUMERIC(10, 2) NOT NULL,
-  stock INTEGER NOT NULL,
-  available_at TIMESTAMP NOT NULL
-);
-```
-Then, uncomment app/api/seed.ts and hit http://localhost:3000/api/seed to seed the database
-
-Next, copy the .env.example file to .env and update the values. Follow the instructions in the .env.example file to set up your env variables.
+Next, copy the .env.example file to .env.local and update the values. Follow the instructions in the .env.example file to set up your env variables.
 
 ```sh
 npm i -g vercel
@@ -83,89 +66,41 @@ vercel link
 vercel env pull
 ```
 
-Finally, run the following commands to start the development server:
+When your env variables are setup you then need to install the dependencies and you'll be able to setup the database and seed it:
 
 ```sh
-npm install
+pnpm install
+pnpm prisma:migrate:reset
 ```
 
-You'll need the the following BSV Libraries:
+Finally, run the following command to start the development server:
+
 ```sh
-npm i @bsv/sdk
+pnpm dev
 ```
 
 You should now be able to access the application at http://localhost:3000.
 
-
 ## Database Schema Management
+
 Maintaining a consistent PostgreSQL database schema is crucial for collaboration among all contributors.
 
 This section outlines the process for managing schema changes, creating migration scripts, and ensuring everyone is on the same page.
 
 #### Creating Migration Scripts
 
-Use a migration tool Knex.js
+First, make some change to the Prisma schema in `prisma/schema.prisma`.
 
 To create a migration script, run the following command in your terminal:
 
 ```sh
-bash
-npx knex migrate:make <migration_name>
+pnpm prisma:migrate:dev
 ```
 
-Replace <migration_name> with a descriptive name reflecting the changes being made (e.g., create_users_table).
+You will be prompted for a name to describe the changes being made (e.g., create_users_table).
+The migration script will be run against your own local DB so you can start developing your new feature right-away.
 
-#### Editing Migration Scripts
-
-Open the newly created migration file in the migrations directory. You’ll find two functions: up and down.
-In the up function, add the SQL commands to create or modify tables. In the down function, add commands to revert these changes. For example:
-
-
-```jv
-exports.up = function(knex) {
-  return knex.schema.createTable('users', function(table) {
-    table.increments('id').primary();
-    table.string('name');
-    table.string('email').unique();
-    table.timestamps(true, true);
-  });
-};
-
-exports.down = function(knex) {
-  return knex.schema.dropTable('users');
-};
-```
-
-#### Testing Migrations Locally
-
-Before pushing changes, run your migration scripts locally to ensure they work as expected. Use the following command:
-bash
-
-```sh
-npx knex migrate:latest
-```
-
-## Error running the migrations
-
-In case you encounter an error during the migration process, do the following steps:
-
-1. Run the following command to source the env variables:
-
-```sh
-source .env
-```
-2. Run the migration scripts again
-
-3. If this doesn't work, run the following command:
-
-```sh
-POSTGRES_URL="..." pnpm knex migrate:latest
-```
-
-This will apply all pending migrations to your local database. You can revert changes using:
-```sh
-npx knex migrate:rollback
-```
+[Read more about the Prisma workflow.](https://www.prisma.io/docs/orm/prisma-migrate/workflows/team-development)
 
 #### Creating a Pull Request
 
@@ -174,26 +109,6 @@ Include a concise description of the schema changes.
 List the migration scripts included in the PR.
 Reference any discussions related to your changes.
 Tag other contributors for review.
-
-#### Merging Changes
-
-Once the PR is approved, merge the changes into the main branch. After merging, make sure to run the migration scripts on the shared development database hosted on Vercel.
-Applying Migrations in Vercel
-
-After merging your PR, ensure that the migration scripts are executed on the Vercel DB. You can run migrations by adding a script in your package.json:
-```sh
-Copy code
-"scripts": {
-  "migrate": "knex migrate:latest --env production"
-}
-```
-
-Run the migration command on Vercel using:
-```sh
-bash
-Copy code
-npm run migrate
-```
 
 #### Documenting Changes
 
