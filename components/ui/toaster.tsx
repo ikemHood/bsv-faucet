@@ -13,8 +13,8 @@ import {
 interface ToastData {
   id: string | number;
   title?: string;
-  description?: string;
-  //action?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: React.ReactNode;
   [key: string]: any;
 }
 
