@@ -7,8 +7,16 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
+import { fetchUser } from '@/lib/prisma';
+import { redirect } from 'next/navigation';
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  const user = await fetchUser();
+
+  if (!user || user.role !== 'admin') {
+    redirect('/dashboard');
+  }
+
   return (
     <Card>
       <CardHeader>
