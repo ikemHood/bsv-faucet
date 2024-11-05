@@ -177,10 +177,10 @@ export default function DashboardPage() {
               max='100000000'
             />
 
-            {/* <ReCAPTCHA
+            <ReCAPTCHA
               sitekey={RECAPTCHA_SITE_KEY}
               onChange={onCaptchaChange}
-            /> */}
+            />
 
             {remainingTime > 0 && (
               <div className='flex items-center space-x-2 text-yellow-600'>
