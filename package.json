@@ -10,6 +10,7 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build",
     "prisma:generate": "prisma generate",
     "prisma:db:seed": "dotenvx run -f .env.local -- prisma db seed",
     "prisma:migrate:dev": "dotenvx run -f .env.local -- prisma migrate dev",
