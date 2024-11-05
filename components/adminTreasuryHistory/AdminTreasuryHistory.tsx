@@ -59,7 +59,7 @@ const AdminTreasury = () => {
       setError(null);
       try {
         // Fetch deposit history
-        const historyResponse = await fetch('/api/deposit-history');
+        const historyResponse = await fetch('/api/transactions');
         if (!historyResponse.ok) {
           throw new Error('Failed to fetch deposit history');
         }
@@ -150,7 +150,7 @@ const AdminTreasury = () => {
         </CardContent>
       </Card>
 
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Recent Transactions</CardTitle>
         </CardHeader>
@@ -233,7 +233,7 @@ const AdminTreasury = () => {
             ))}
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 };
