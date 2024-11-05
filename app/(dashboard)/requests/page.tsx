@@ -15,6 +15,7 @@ export default async function RequestsPage() {
     return null;
   }
   const transactions = await fetchTransactions(user);
+  const transactionsWithUser = transactions.map(tx => ({ ...tx, user }));
   return (
     <Card>
       <CardHeader>
@@ -23,7 +24,7 @@ export default async function RequestsPage() {
       </CardHeader>
       <CardContent>
         <Toolbar />
-        <LatestTransactionsTable user={user} transactions={transactions} />
+        <LatestTransactionsTable user={user} transactions={transactionsWithUser} />
       </CardContent>
     </Card>
   );
