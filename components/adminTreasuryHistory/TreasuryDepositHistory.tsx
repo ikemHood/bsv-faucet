@@ -1,37 +1,37 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Copy, AlertCircle } from "lucide-react"
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Copy, AlertCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Skeleton } from "@/components/ui/skeleton"
-import useWalletMonitor from '@/hooks/useWalletMonitor'
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import useWalletMonitor from "@/hooks/useWalletMonitor";
 
 interface Transaction {
-  id: number
-  txid: string
+  id: number;
+  txid: string;
   beefTx: {
-    txid: string
-    vout: number
-    value: number
-  }
+    txid: string;
+    vout: number;
+    value: number;
+  };
   vout: Array<{
-    address: string
-    satoshis: number
-  }>
-  txType: 'deposit'
-  amount: string
-  date: string
+    address: string;
+    satoshis: number;
+  }>;
+  txType: "deposit";
+  amount: string;
+  date: string;
 }
 
 const TransactionSkeleton = () => (
@@ -45,48 +45,57 @@ const TransactionSkeleton = () => (
       <Skeleton className="h-8 w-16" />
     </div>
   </div>
-)
+);
 
 export default function TreasuryDepositHistory() {
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<Transaction | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useWalletMonitor()
+  useWalletMonitor();
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
       try {
-        const response = await fetch('/api/transactions')
+        const response = await fetch("/api/transactions");
         if (!response.ok) {
-          throw new Error('Failed to fetch transactions')
+          throw new Error("Failed to fetch transactions");
         }
-        const data: Transaction[] = await response.json()
-        setTransactions(data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()))
+        const data: Transaction[] = await response.json();
+        setTransactions(
+          data.sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          )
+        );
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred while fetching transactions')
+        setError(
+          err instanceof Error
+            ? err.message
+            : "An error occurred while fetching transactions"
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchTransactions()
-  }, [])
+    fetchTransactions();
+  }, []);
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-  }
+    navigator.clipboard.writeText(text);
+  };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString()
-  }
+    return new Date(dateString).toLocaleString();
+  };
 
   const formatAmount = (amount: string) => {
-    return (parseInt(amount) / 100000000).toFixed(8)
-  }
+    return (parseInt(amount) / 100000000).toFixed(8);
+  };
 
   if (error) {
     return (
@@ -95,7 +104,7 @@ export default function TreasuryDepositHistory() {
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>{error}</AlertDescription>
       </Alert>
-    )
+    );
   }
 
   return (
@@ -122,7 +131,8 @@ export default function TreasuryDepositHistory() {
                     + {formatAmount(tx.amount)} BSV
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    Txid: {tx.txid.substring(0, 8)}... | Beef TX: {tx.beefTx.txid.substring(0, 8)}...
+                    Txid: {tx.txid.substring(0, 8)}... | Beef TX:{" "}
+                    {tx.beefTx.txid.substring(0, 8)}...
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -131,7 +141,11 @@ export default function TreasuryDepositHistory() {
                   </div>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" onClick={() => setSelectedTransaction(tx)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedTransaction(tx)}
+                      >
                         Details
                       </Button>
                     </DialogTrigger>
@@ -146,7 +160,11 @@ export default function TreasuryDepositHistory() {
                           </Label>
                           <Input
                             id="date"
-                            value={selectedTransaction ? formatDate(selectedTransaction.date) : ''}
+                            value={
+                              selectedTransaction
+                                ? formatDate(selectedTransaction.date)
+                                : ""
+                            }
                             className="col-span-3"
                             readOnly
                           />
@@ -157,7 +175,7 @@ export default function TreasuryDepositHistory() {
                           </Label>
                           <Input
                             id="txid"
-                            value={selectedTransaction?.txid || ''}
+                            value={selectedTransaction?.txid || ""}
                             className="col-span-3"
                             readOnly
                           />
@@ -168,7 +186,7 @@ export default function TreasuryDepositHistory() {
                           </Label>
                           <Input
                             id="beefTx"
-                            value={selectedTransaction?.beefTx.txid || ''}
+                            value={selectedTransaction?.beefTx.txid || ""}
                             className="col-span-3"
                             readOnly
                           />
@@ -179,7 +197,9 @@ export default function TreasuryDepositHistory() {
                           </Label>
                           <Input
                             id="vout"
-                            value={selectedTransaction?.beefTx.vout.toString() || ''}
+                            value={
+                              selectedTransaction?.beefTx.vout.toString() || ""
+                            }
                             className="col-span-3"
                             readOnly
                           />
@@ -190,7 +210,7 @@ export default function TreasuryDepositHistory() {
                           </Label>
                           <Input
                             id="txType"
-                            value={selectedTransaction?.txType || ''}
+                            value={selectedTransaction?.txType || ""}
                             className="col-span-3"
                             readOnly
                           />
@@ -201,7 +221,12 @@ export default function TreasuryDepositHistory() {
                           </Label>
                           <Input
                             id="amount"
-                            value={selectedTransaction ? formatAmount(selectedTransaction.amount) + ' BSV' : ''}
+                            value={
+                              selectedTransaction
+                                ? formatAmount(selectedTransaction.amount) +
+                                  " BSV"
+                                : ""
+                            }
                             className="col-span-3"
                             readOnly
                           />
@@ -211,7 +236,9 @@ export default function TreasuryDepositHistory() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => copyToClipboard(selectedTransaction?.txid || '')}
+                          onClick={() =>
+                            copyToClipboard(selectedTransaction?.txid || "")
+                          }
                         >
                           <Copy className="mr-2 h-4 w-4" />
                           Copy Txid
@@ -219,7 +246,11 @@ export default function TreasuryDepositHistory() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => copyToClipboard(selectedTransaction?.beefTx.txid || '')}
+                          onClick={() =>
+                            copyToClipboard(
+                              selectedTransaction?.beefTx.txid || ""
+                            )
+                          }
                         >
                           <Copy className="mr-2 h-4 w-4" />
                           Copy Beef TX
@@ -234,5 +265,5 @@ export default function TreasuryDepositHistory() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
