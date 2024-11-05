@@ -2,7 +2,7 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       // system
-      readonly NODE_ENV: "development" | "production" | "test";
+      readonly NODE_ENV: 'development' | 'production' | 'test';
       // private
       readonly POSTGRES_URL: string;
       readonly POSTGRES_PRISMA_URL: string;
@@ -18,6 +18,7 @@ declare global {
       readonly NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: string;
       readonly NEXT_PUBLIC_CLERK_SIGN_IN_URL: string;
       readonly NEXT_PUBLIC_CLERK_SIGN_UP_URL: string;
+      readonly NEXT_PUBLIC_RECAPTCHA_SITE_KEY: string;
       readonly NEXT_PUBLIC_RECAPTCHA_SITE_KEY: string;
     }
   }
