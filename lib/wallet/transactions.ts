@@ -1,6 +1,6 @@
 import { PrivateKey, P2PKH, Transaction, TransactionInput } from '@bsv/sdk';
 import { getUTXOs, getRawTransaction, broadcastTransaction } from './regest';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@/prisma/generated/client';
 
 interface UTXO {
   tx_hash: string;

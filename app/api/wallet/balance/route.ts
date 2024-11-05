@@ -1,7 +1,7 @@
 import { getUTXOs } from '@/lib/wallet/regest';
 import { PrivateKey } from '@bsv/sdk';
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@/prisma/generated/client';
 
 const prisma = new PrismaClient();
 
@@ -14,13 +14,16 @@ export async function GET(req: Request) {
     }
 
     if (!wallet.privateKey) {
-      return NextResponse.json({ error: 'Private key is missing' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Private key is missing' },
+        { status: 400 }
+      );
     }
 
     const privateKey = PrivateKey.fromWif(wallet.privateKey);
     const address = privateKey.toAddress('testnet').toString();
     const utxos = await getUTXOs(address);
-    
+
     if (!utxos || utxos.length === 0) {
       return NextResponse.json({ balance: 0 });
     }
