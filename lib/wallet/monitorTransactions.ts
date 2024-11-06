@@ -1,24 +1,24 @@
 import cron from 'node-cron';
 import { getUTXOs, getRawTransaction } from './regest'; // Make sure these functions are correctly implemented
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@/prisma/generated/client';
 import { PrivateKey } from '@bsv/sdk';
 
 const prisma = new PrismaClient();
 
 const startTransactionMonitor = async () => {
   const wallet = await prisma.wallet.findFirst();
-  if (!wallet) throw new Error("Wallet not found");
+  if (!wallet) throw new Error('Wallet not found');
 
   const treasuryWIF = process.env.TREASURY_WALLET_WIF as string;
   const privateKey = PrivateKey.fromWif(wallet.privateKey);
-  const treasuryAddress = privateKey.toAddress("testnet").toString();
+  const treasuryAddress = privateKey.toAddress('testnet').toString();
 
   const monitorIncomingTransactions = async () => {
     try {
       const utxos = await getUTXOs(treasuryAddress);
       for (const utxo of utxos) {
         const existingTransaction = await prisma.transaction.findUnique({
-          where: { txid: utxo.tx_hash },
+          where: { txid: utxo.tx_hash }
         });
         if (!existingTransaction) {
           const rawTx = await getRawTransaction(utxo.tx_hash);
@@ -30,31 +30,33 @@ const startTransactionMonitor = async () => {
               beefTx: {
                 txid: utxo.tx_hash,
                 vout: utxo.tx_pos,
-                value: utxo.value,
+                value: utxo.value
               },
               vout: [
                 {
                   address: treasuryAddress,
-                  satoshis: utxo.value,
-                },
+                  satoshis: utxo.value
+                }
               ],
-              txType: "deposit",
+              txType: 'deposit',
               spentStatus: false,
               testnetFlag: true,
-              amount: BigInt(utxo.value),
-            },
+              amount: BigInt(utxo.value)
+            }
           });
           console.log(`New incoming transaction recorded: ${utxo.tx_hash}`);
         }
       }
     } catch (error) {
-      console.error("Error monitoring incoming transactions:", error);
+      console.error('Error monitoring incoming transactions:', error);
     }
   };
-
+  monitorIncomingTransactions();
   cron.schedule('* * * * *', monitorIncomingTransactions);
 };
 
 export const startMonitor = async () => {
-  await startTransactionMonitor().catch(error => console.error("Error starting the monitor:", error));
+  await startTransactionMonitor().catch((error) =>
+    console.error('Error starting the monitor:', error)
+  );
 };
