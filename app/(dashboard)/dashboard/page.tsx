@@ -6,7 +6,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from '@/components/ui/card';
 import { fetchUser, fetchTransactions } from '@/lib/prisma';
 import LatestTransactionsTable from '../latest-transactions-table';
@@ -18,7 +18,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from '@/components/ui/table';
 import { Timer, Wallet, History, AlertTriangle } from 'lucide-react';
 import { createAndSendTransaction } from '@/lib/wallet/transactions';
@@ -53,8 +53,8 @@ export default function DashboardPage() {
         date: new Date().toISOString(),
         amount: 50000000,
         status: 'Completed',
-        txId: '1234567890abcdef',
-      },
+        txId: '1234567890abcdef'
+      }
     ]);
 
     const timeLeft = localStorage.getItem('nextRequestTime');
@@ -88,7 +88,6 @@ export default function DashboardPage() {
       const amountInSatoshis = parseInt(amount);
       const privKeyWif = process.env.TREASURY_WALLET_WIF as string;
 
-      // Use the imported transaction function
       const txid = await createAndSendTransaction(
         privKeyWif,
         address,
@@ -102,6 +101,7 @@ export default function DashboardPage() {
       );
       setTotalRequested((prev) => prev + amountInSatoshis);
       setFaucetBalance((prev) => prev - amountInSatoshis);
+      await updateFaucetBalance();
 
       // Update transaction history
       setRecentHistory((prev) =>
@@ -111,9 +111,9 @@ export default function DashboardPage() {
             date: new Date().toISOString(),
             amount: amountInSatoshis,
             status: 'Completed',
-            txId: txid,
+            txId: txid
           },
-          ...prev,
+          ...prev
         ].slice(0, 5)
       );
 
@@ -126,6 +126,23 @@ export default function DashboardPage() {
       console.error('Transaction error:', err);
     }
   };
+  const updateFaucetBalance = async () => {
+    try {
+      const response = await fetch('/api/wallet/balance');
+      if (!response.ok) {
+        throw new Error('Failed to fetch balance');
+      }
+      const data = await response.json();
+      setFaucetBalance(data.balance);
+    } catch (error) {
+      console.error('Error fetching faucet balance:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update faucet balance',
+        variant: 'destructive'
+      });
+    }
+  };
 
   const onCaptchaChange = (value: string | null) => {
     setCaptchaValue(value || '');
@@ -136,7 +153,13 @@ export default function DashboardPage() {
     const minutes = Math.floor((time % (60 * 60 * 1000)) / (60 * 1000));
     return `${hours}h ${minutes}m`;
   };
+  useEffect(() => {
+    updateFaucetBalance();
 
+    const intervalId = setInterval(updateFaucetBalance, 60000);
+
+    return () => clearInterval(intervalId);
+  }, []);
   useEffect(() => {
     const timer = setInterval(() => {
       setRemainingTime((prev) => Math.max(0, prev - 1000));
@@ -145,33 +168,33 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className='space-y-4'>
+    <div className="space-y-4">
       <Card>
         <CardHeader>
           <CardTitle>BSV Testnet Faucet</CardTitle>
           <CardDescription>Request testnet BSV tokens</CardDescription>
         </CardHeader>
-        <CardContent className='space-y-4'>
-          <div className='flex items-center justify-between p-4 bg-secondary rounded-lg'>
-            <div className='flex items-center space-x-2'>
-              <Wallet className='h-5 w-5' />
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
+            <div className="flex items-center space-x-2">
+              <Wallet className="h-5 w-5" />
               <span>Faucet Balance:</span>
             </div>
-            <span className='font-bold'>{faucetBalance} satoshis</span>
+            <span className="font-bold">{faucetBalance} satoshis</span>
           </div>
 
-          <div className='space-y-4'>
+          <div className="space-y-4">
             <Input
-              placeholder='Enter BSV testnet address'
+              placeholder="Enter BSV testnet address"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             />
             <Input
-              type='number'
-              placeholder='Amount (in satoshis, max 100,000,000)'
+              type="number"
+              placeholder="Amount (in satoshis, max 100,000,000)"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              max='100000000'
+              max="100000000"
             />
 
             <ReCAPTCHA
@@ -180,8 +203,8 @@ export default function DashboardPage() {
             />
 
             {remainingTime > 0 && (
-              <div className='flex items-center space-x-2 text-yellow-600'>
-                <Timer className='h-5 w-5' />
+              <div className="flex items-center space-x-2 text-yellow-600">
+                <Timer className="h-5 w-5" />
                 <span>
                   Next request available in:{' '}
                   {formatTimeRemaining(remainingTime)}
@@ -190,7 +213,7 @@ export default function DashboardPage() {
             )}
 
             <Button
-              className='w-full'
+              className="w-full"
               onClick={handleRequest}
               disabled={remainingTime > 0}
             >
@@ -199,14 +222,14 @@ export default function DashboardPage() {
           </div>
 
           {error && (
-            <p className='text-red-500' role='alert'>
-              <AlertTriangle className='inline h-4 w-4 mr-2' />
+            <p className="text-red-500" role="alert">
+              <AlertTriangle className="inline h-4 w-4 mr-2" />
               {error}
             </p>
           )}
           {success && (
-            <p className='text-green-500' role='status'>
-              <History className='inline h-4 w-4 mr-2' />
+            <p className="text-green-500" role="status">
+              <History className="inline h-4 w-4 mr-2" />
               {success}
             </p>
           )}
@@ -239,9 +262,9 @@ export default function DashboardPage() {
                   <TableCell>
                     <a
                       href={`https://test.whatsonchain.com/tx/${request.txId}`}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='text-blue-500 hover:underline'
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
                       title={`View Transaction ${request.txId}`}
                     >
                       {request.txId.substring(0, 8)}...
@@ -253,23 +276,31 @@ export default function DashboardPage() {
           </Table>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader>
           <CardTitle>Donate to Faucet</CardTitle>
-          <CardDescription>Donate unused BSV back to the Faucet.</CardDescription>
+          <CardDescription>
+            Donate unused BSV back to the Faucet.
+          </CardDescription>
         </CardHeader>
-        <CardContent className='h-full w-full flex items-center'>
+        <CardContent className="h-full w-full flex items-center">
           <div className="p-4 rounded-lg">
             <div className="text-sm font-medium">Fuacet Address</div>
-            <p className='text-sm text-muted-foreground'> click to copy address, send unused BSV back to faucet address</p>
-            <div className="text-xl text-center bg-secondary rounded-lg p-2 px-4 font-semibold" onClick={() => {
-              navigator.clipboard.writeText(AdminWalletAddress);
-              toast({
-                title: 'Copied to clipboard',
-                description: `Fuacet address copied to clipboard`
-              });
-            }}>
+            <p className="text-sm text-muted-foreground">
+              {' '}
+              click to copy address, send unused BSV back to faucet address
+            </p>
+            <div
+              className="text-xl text-center bg-secondary rounded-lg p-2 px-4 font-semibold"
+              onClick={() => {
+                navigator.clipboard.writeText(AdminWalletAddress);
+                toast({
+                  title: 'Copied to clipboard',
+                  description: `Fuacet address copied to clipboard`
+                });
+              }}
+            >
               {AdminWalletAddress}
             </div>
           </div>
