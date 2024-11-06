@@ -1,136 +1,77 @@
-import { Webhook } from "svix";
-import { headers } from "next/headers";
-import { WebhookEvent } from "@clerk/nextjs/server";
-import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import {   WebhookEvent,
+  DeletedObjectJSON,
+  EmailJSON,
+  OrganizationInvitationJSON,
+  OrganizationJSON,
+  OrganizationMembershipJSON,
+  SessionJSON,
+  SMSMessageJSON,
+  UserJSON
+} from '@clerk/nextjs/server';
+import { Webhook } from 'svix'
 
-interface EmailAddress {
-  email_address: string;
-  id: string;
-  object: string;
-  verification: {
-    status: string;
-    strategy: string;
-  };
-}
+import { headers } from 'next/headers';
+import { prisma } from '@/lib/prisma';
 
-interface UserWebhookData {
-  id: string;
-  username: string | null;
-  email_addresses: EmailAddress[];
-  image_url: string;
-  first_name: string | null;
-  last_name: string | null;
-  profile_image_url: string;
-}
+export async function POST(req: Request) {
+  const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
 
-const webhookSecret = process.env.WEBHOOK_SECRET;
-
-async function handler(request: Request) {
-  const headerPayload = await headers();
-  const svix_id = headerPayload.get("svix-id");
-  const svix_timestamp = headerPayload.get("svix-timestamp");
-  const svix_signature = headerPayload.get("svix-signature");
-
-  if (!svix_id || !svix_timestamp || !svix_signature) {
-    return new NextResponse("Missing svix headers", { status: 400 });
+  if (!WEBHOOK_SECRET) {
+    throw new Error('Please add WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local');
   }
 
-  const payload = await request.json();
+  // Get the headers
+  const headerPayload = await headers();
+  const svix_id = headerPayload.get('svix-id');
+  const svix_timestamp = headerPayload.get('svix-timestamp');
+  const svix_signature = headerPayload.get('svix-signature');
+
+  if (!svix_id || !svix_timestamp || !svix_signature) {
+    return new Response('Error occurred -- no svix headers', { status: 400 });
+  }
+
+  // Get the body
+  const payload = await req.json();
   const body = JSON.stringify(payload);
 
-  const wh = new Webhook(webhookSecret || "");
-
+  const wh = new Webhook(WEBHOOK_SECRET);
   let evt: WebhookEvent;
 
   try {
     evt = wh.verify(body, {
-      "svix-id": svix_id,
-      "svix-timestamp": svix_timestamp,
-      "svix-signature": svix_signature,
+      'svix-id': svix_id,
+      'svix-timestamp': svix_timestamp,
+      'svix-signature': svix_signature,
     }) as WebhookEvent;
   } catch (err) {
-    console.error("Error verifying webhook:", err);
-    return new NextResponse("Error verifying webhook", { status: 400 });
+    console.error('Error verifying webhook:', err);
+    return new Response('Error occurred', { status: 400 });
   }
 
-  const eventType = evt.type;
-  const { data } = evt;
+  // Use the imported Clerk types to type-check the data
+  const { data, type: eventType } = evt;
 
-  if (eventType === "user.created") {
-    const userData = data as unknown as UserWebhookData;
-
-    try {
-      const username =
-        userData.username ||
-        `${userData.first_name || ""}${userData.last_name || ""}`.toLowerCase() ||
-        userData.id.slice(0, 8);
-
-      // Add a temporary password (you can adjust this as needed)
-      const password = "defaultPassword123"; // or use `null` or any default value
-
-      // Create the user with the password field
+  try {
+    if (eventType === 'user.created') {
+      const userData = data as UserJSON;
+      
       await prisma.user.create({
         data: {
           userId: userData.id,
-          username: username,
-          email: userData.email_addresses[0]?.email_address,
-          imageUrl: userData.profile_image_url || userData.image_url,
-          role: "user",
-          theme: "light",
-          password: password, // provide a default password
+          username: userData.username || `${userData.first_name || ''}${userData.last_name || ''}`.toLowerCase() || userData.id.slice(0, 8),
+          email: userData.email_addresses[0]?.email_address || '',
+          imageUrl: userData.image_url,
+          role: 'user',
+          theme: 'light',
+          password: 'defaultPassword123',
         },
       });
-
-      return new NextResponse("User created", { status: 200 });
-    } catch (error) {
-      console.error("Error creating user:", error);
-      return new NextResponse("Error creating user", { status: 500 });
     }
+    // Add additional event handling here as needed
+
+    return new Response('Webhook processed', { status: 200 });
+  } catch (error) {
+    console.error(`Error processing event ${eventType}:`, error);
+    return new Response('Error processing event', { status: 500 });
   }
-
-  if (eventType === "user.updated") {
-    const userData = data as unknown as UserWebhookData;
-
-    try {
-      await prisma.user.update({
-        where: { userId: userData.id },
-        data: {
-          username: userData.username || undefined,
-          email: userData.email_addresses[0]?.email_address,
-          imageUrl: userData.profile_image_url || userData.image_url,
-        },
-      });
-
-      return new NextResponse("User updated", { status: 200 });
-    } catch (error) {
-      console.error("Error updating user:", error);
-      return new NextResponse("Error updating user", { status: 500 });
-    }
-  }
-
-  if (eventType === "user.deleted") {
-    const userData = data as unknown as UserWebhookData;
-
-    try {
-      await prisma.user.delete({
-        where: { userId: userData.id },
-      });
-
-      return new NextResponse("User deleted", { status: 200 });
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      return new NextResponse("Error deleting user", { status: 500 });
-    }
-  }
-
-  return new NextResponse("Webhook received", { status: 200 });
 }
-
-export const POST = handler;
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
