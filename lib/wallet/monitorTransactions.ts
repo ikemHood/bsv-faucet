@@ -6,11 +6,8 @@ import { PrivateKey } from '@bsv/sdk';
 const prisma = new PrismaClient();
 
 const startTransactionMonitor = async () => {
-  const wallet = await prisma.wallet.findFirst();
-  if (!wallet) throw new Error('Wallet not found');
-
   const treasuryWIF = process.env.TREASURY_WALLET_WIF as string;
-  const privateKey = PrivateKey.fromWif(wallet.privateKey);
+  const privateKey = PrivateKey.fromWif(treasuryWIF);
   const treasuryAddress = privateKey.toAddress('testnet').toString();
 
   const monitorIncomingTransactions = async () => {
