@@ -95,7 +95,6 @@ export default function DashboardPage() {
         'testnet'
       );
 
-      // Update UI state
       setSuccess(
         `Successfully sent ${amount} satoshis to ${address}. TxID: ${txid}`
       );
@@ -103,7 +102,6 @@ export default function DashboardPage() {
       setFaucetBalance((prev) => prev - amountInSatoshis);
       await updateFaucetBalance();
 
-      // Update transaction history
       setRecentHistory((prev) =>
         [
           {
