@@ -35,6 +35,7 @@ import { NavItem } from './nav-item';
 import { SearchInput } from './search';
 
 import DbBreadcrumb from '@/components/ui/DbBreadcrumb';
+import { fetchUser } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,7 +65,8 @@ export default function DashboardLayout({
   );
 }
 
-function DesktopNav() {
+async function DesktopNav() {
+  const user = await fetchUser();
   return (
     <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
       <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
@@ -88,9 +90,11 @@ function DesktopNav() {
           <Users2 className="h-5 w-5" />
         </NavItem>
 
-        <NavItem href="/admin" label="Admin">
-          <Shield className="h-5 w-5" />
-        </NavItem>
+        {user?.role === 'admin' && (
+          <NavItem href="/admin" label="Admin">
+            <Shield className="h-5 w-5" />
+          </NavItem>
+        )}
 
         {/* <NavItem href="#" label="Analytics">
           <LineChart className="h-5 w-5" />
@@ -114,7 +118,8 @@ function DesktopNav() {
   );
 }
 
-function MobileNav() {
+async function MobileNav() {
+  const user = await fetchUser();
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -153,13 +158,15 @@ function MobileNav() {
             <Users2 className="h-5 w-5" />
             Users
           </Link>
-          <Link
-            href="/admin"
-            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+          {user?.role === 'admin' && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
           >
             <Shield className="h-5 w-5" />
-            Admin
-          </Link>
+              Admin
+            </Link>
+          )}
           <Link
             href="/settings"
             className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
