@@ -1,26 +1,15 @@
 import { getUTXOs } from '@/lib/wallet/regest';
 import { PrivateKey } from '@bsv/sdk';
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@/prisma/generated/client';
-
-const prisma = new PrismaClient();
 
 export async function GET(req: Request) {
   try {
-    const wallet = await prisma.wallet.findFirst();
-
-    if (!wallet) {
+    const treasuryWIF = process.env.TREASURY_WALLET_WIF;
+    if (!treasuryWIF) {
       return NextResponse.json({ error: 'No wallet found' }, { status: 404 });
     }
 
-    if (!wallet.privateKey) {
-      return NextResponse.json(
-        { error: 'Private key is missing' },
-        { status: 400 }
-      );
-    }
-
-    const privateKey = PrivateKey.fromWif(wallet.privateKey);
+    const privateKey = PrivateKey.fromWif(treasuryWIF);
     const address = privateKey.toAddress('testnet').toString();
     const utxos = await getUTXOs(address);
 

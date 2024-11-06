@@ -129,9 +129,8 @@ export async function GET(request: NextRequest) {
 
   try {
     console.log('Fetching user data for userId:', user.id); // Log user ID
-
     const userData = await prisma.user.findUnique({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
 
     if (!userData) {
@@ -139,9 +138,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    // Convert any BigInt fields to strings in the userData object
+    const safeUserData = JSON.parse(
+      JSON.stringify(userData, (key, value) =>
+        typeof value === 'bigint' ? value.toString() : value
+      )
+    );
+
     return NextResponse.json({
       message: 'User data retrieved successfully',
-      data: userData
+      data: safeUserData,
     });
   } catch (error) {
     console.error('Error fetching user data:', error);

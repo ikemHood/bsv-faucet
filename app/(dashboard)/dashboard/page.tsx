@@ -86,9 +86,7 @@ export default function DashboardPage() {
 
     try {
       const amountInSatoshis = parseInt(amount);
-      const privKeyWif =
-        process.env.NEXT_PUBLIC_PRIVATE_KEY_WIF ||
-        'L3zd4gcFAjxr36hwfoWEPGyuNyCCV3g54Sr4RCy8Lmt4wGjHae3k';
+      const privKeyWif = process.env.TREASURY_WALLET_WIF as string;
 
       // Use the imported transaction function
       const txid = await createAndSendTransaction(
