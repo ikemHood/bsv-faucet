@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import {
@@ -8,8 +9,6 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { fetchUser, fetchTransactions } from '@/lib/prisma';
-import LatestTransactionsTable from '../latest-transactions-table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,44 +22,79 @@ import {
 import { Timer, Wallet, History, AlertTriangle } from 'lucide-react';
 import { createAndSendTransaction } from '@/lib/wallet/transactions';
 import { toast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 import { AdminWalletAddress } from '@/lib/utils';
+
+interface Transaction {
+  id: number;
+  date: string;
+  txid: string;
+  amount: number;
+  txType: string;
+}
 
 export default function DashboardPage() {
   const [address, setAddress] = useState('');
   const [amount, setAmount] = useState('');
   const [captchaValue, setCaptchaValue] = useState('');
   const [remainingTime, setRemainingTime] = useState(0);
-  const [totalRequested, setTotalRequested] = useState(0);
-  const [faucetBalance, setFaucetBalance] = useState(100000000); // 1 BSV in satoshis
+  const [faucetBalance, setFaucetBalance] = useState<number | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  interface RequestHistory {
-    id: number;
-    date: string;
-    amount: number;
-    status: string;
-    txId: string;
-  }
-
-  const [recentHistory, setRecentHistory] = useState<RequestHistory[]>([]);
   const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '';
 
-  useEffect(() => {
-    setRecentHistory([
-      {
-        id: 1,
-        date: new Date().toISOString(),
-        amount: 50000000,
-        status: 'Completed',
-        txId: '1234567890abcdef'
-      }
-    ]);
+  const adminWalletAddress = AdminWalletAddress();
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [balanceResponse, transactionsResponse] = await Promise.all([
+          fetch('/api/wallet/balance'),
+          fetch('/api/transactions')
+        ]);
+
+        if (!balanceResponse.ok || !transactionsResponse.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const balanceData = await balanceResponse.json();
+        const transactionsData = await transactionsResponse.json();
+        console.log(adminWalletAddress)
+        setFaucetBalance(balanceData.balance);
+        setTransactions(transactionsData.transactions);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load faucet data',
+          variant: 'destructive'
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+    const intervalId = setInterval(fetchData, 60000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
     const timeLeft = localStorage.getItem('nextRequestTime');
     if (timeLeft) {
       setRemainingTime(Math.max(0, parseInt(timeLeft) - Date.now()));
     }
+
+    const timer = setInterval(() => {
+      setRemainingTime((prev) => Math.max(0, prev - 1000));
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
   const isValidBSVAddress = (addr: string) =>
@@ -98,22 +132,19 @@ export default function DashboardPage() {
       setSuccess(
         `Successfully sent ${amount} satoshis to ${address}. TxID: ${txid}`
       );
-      setTotalRequested((prev) => prev + amountInSatoshis);
-      setFaucetBalance((prev) => prev - amountInSatoshis);
-      await updateFaucetBalance();
 
-      setRecentHistory((prev) =>
-        [
-          {
-            id: Date.now(),
-            date: new Date().toISOString(),
-            amount: amountInSatoshis,
-            status: 'Completed',
-            txId: txid
-          },
-          ...prev
-        ].slice(0, 5)
-      );
+      // Refresh data after successful transaction
+      const [balanceResponse, transactionsResponse] = await Promise.all([
+        fetch('/api/wallet/balance'),
+        fetch('/api/transactions')
+      ]);
+
+      if (balanceResponse.ok && transactionsResponse.ok) {
+        const balanceData = await balanceResponse.json();
+        const transactionsData = await transactionsResponse.json();
+        setFaucetBalance(balanceData.balance);
+        setTransactions(transactionsData.transactions);
+      }
 
       // Set cooldown period
       const nextRequestTime = Date.now() + 24 * 60 * 60 * 1000;
@@ -122,23 +153,6 @@ export default function DashboardPage() {
     } catch (err: any) {
       setError(`Failed to process request: ${err.message}`);
       console.error('Transaction error:', err);
-    }
-  };
-  const updateFaucetBalance = async () => {
-    try {
-      const response = await fetch('/api/wallet/balance');
-      if (!response.ok) {
-        throw new Error('Failed to fetch balance');
-      }
-      const data = await response.json();
-      setFaucetBalance(data.balance);
-    } catch (error) {
-      console.error('Error fetching faucet balance:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update faucet balance',
-        variant: 'destructive'
-      });
     }
   };
 
@@ -151,19 +165,6 @@ export default function DashboardPage() {
     const minutes = Math.floor((time % (60 * 60 * 1000)) / (60 * 1000));
     return `${hours}h ${minutes}m`;
   };
-  useEffect(() => {
-    updateFaucetBalance();
-
-    const intervalId = setInterval(updateFaucetBalance, 60000);
-
-    return () => clearInterval(intervalId);
-  }, []);
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setRemainingTime((prev) => Math.max(0, prev - 1000));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   return (
     <div className="space-y-4">
@@ -178,7 +179,11 @@ export default function DashboardPage() {
               <Wallet className="h-5 w-5" />
               <span>Faucet Balance:</span>
             </div>
-            <span className="font-bold">{faucetBalance} satoshis</span>
+            {isLoading ? (
+              <Skeleton className="h-6 w-24" />
+            ) : (
+              <span className="font-bold">{faucetBalance} satoshis</span>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -213,7 +218,7 @@ export default function DashboardPage() {
             <Button
               className="w-full"
               onClick={handleRequest}
-              disabled={remainingTime > 0}
+              disabled={remainingTime > 0 || isLoading}
             >
               Request BSV
             </Button>
@@ -236,8 +241,8 @@ export default function DashboardPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent Requests</CardTitle>
-          <CardDescription>Your last 5 requests</CardDescription>
+          <CardTitle>Recent Transactions</CardTitle>
+          <CardDescription>Last 5 faucet transactions</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -245,31 +250,58 @@ export default function DashboardPage() {
               <TableRow>
                 <TableHead>Date</TableHead>
                 <TableHead>Amount (satoshis)</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Transaction ID</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {recentHistory.map((request) => (
-                <TableRow key={request.id}>
-                  <TableCell>
-                    {new Date(request.date).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>{request.amount}</TableCell>
-                  <TableCell>{request.status}</TableCell>
-                  <TableCell>
-                    <a
-                      href={`https://test.whatsonchain.com/tx/${request.txId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                      title={`View Transaction ${request.txId}`}
-                    >
-                      {request.txId.substring(0, 8)}...
-                    </a>
+              {isLoading ? (
+                Array(5)
+                  .fill(0)
+                  .map((_, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <Skeleton className="h-5 w-24" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-5 w-16" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-5 w-20" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-5 w-32" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+              ) : transactions && transactions.length > 0 ? (
+                transactions.slice(0, 5).map((tx) => (
+                  <TableRow key={tx.id}>
+                    <TableCell>
+                      {new Date(tx.date).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>{tx.amount}</TableCell>
+                    <TableCell>{tx.txType}</TableCell>
+                    <TableCell>
+                      <a
+                        href={`https://test.whatsonchain.com/tx/${tx.txid}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                        title={`View Transaction ${tx.txid}`}
+                      >
+                        {tx.txid.substring(0, 8)}...
+                      </a>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center">
+                    No transactions found
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -284,22 +316,21 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent className="h-full w-full flex items-center">
           <div className="p-4 rounded-lg">
-            <div className="text-sm font-medium">Fuacet Address</div>
+            <div className="text-sm font-medium">Faucet Address</div>
             <p className="text-sm text-muted-foreground">
-              {' '}
-              click to copy address, send unused BSV back to faucet address
+              Click to copy address, send unused BSV back to faucet address
             </p>
             <div
               className="text-xl text-center bg-secondary rounded-lg p-2 px-4 font-semibold"
               onClick={() => {
-                navigator.clipboard.writeText(AdminWalletAddress);
+                navigator.clipboard.writeText(adminWalletAddress);
                 toast({
                   title: 'Copied to clipboard',
-                  description: `Fuacet address copied to clipboard`
+                  description: `Faucet address copied to clipboard`
                 });
               }}
             >
-              {AdminWalletAddress}
+              {adminWalletAddress}
             </div>
           </div>
         </CardContent>
