@@ -81,7 +81,7 @@ const main = async () => {
         ],
         txType: 'incoming',
         amount: 1,
-        userId: 1
+        userId: "1"
       },
       {
         date: '2024-11-02T00:00:00Z',
@@ -97,7 +97,7 @@ const main = async () => {
         ],
         txType: 'incoming',
         amount: 2,
-        userId: 1
+        userId: "1"
       },
       {
         date: '2024-11-03T00:00:00Z',
@@ -113,7 +113,7 @@ const main = async () => {
         ],
         txType: 'incoming',
         amount: 3,
-        userId: 1
+        userId: "1"
       },
       {
         date: '2024-11-04T00:00:00Z',
@@ -129,7 +129,7 @@ const main = async () => {
         ],
         txType: 'incoming',
         amount: 4,
-        userId: 1
+        userId: "1"
       },
       {
         date: '2024-11-05T00:00:00Z',
@@ -145,7 +145,7 @@ const main = async () => {
         ],
         txType: 'incoming',
         amount: 5,
-        userId: 1
+        userId: "1"
       },
       {
         date: '2024-11-06T00:00:00Z',
@@ -161,7 +161,7 @@ const main = async () => {
         ],
         txType: 'incoming',
         amount: 6,
-        userId: 1
+        userId: "1"
       }
     ]
   });
