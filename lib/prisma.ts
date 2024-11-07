@@ -31,7 +31,7 @@ export const fetchUser = async () => {
 
 export const fetchTransactions = async (user: User, take?: number) => {
   const transactions = await prisma.transaction.findMany({
-    where: user.role === 'admin' ? {} : { userId: user.id },
+    where: user.role === 'admin' ? {} : { userId: user.userId },
     include: { user: true },
     orderBy: { date: 'desc' },
     take

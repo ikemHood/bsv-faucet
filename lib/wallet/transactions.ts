@@ -1,6 +1,7 @@
 import { PrivateKey, P2PKH, Transaction, TransactionInput } from '@bsv/sdk';
 import { getUTXOs, getRawTransaction, broadcastTransaction } from './regest';
 import { PrismaClient } from '@/prisma/generated/client';
+import { currentUser } from '@clerk/nextjs/server';
 
 interface UTXO {
   tx_hash: string;
@@ -130,7 +131,8 @@ export const createAndSendTransaction = async (
     if (!txid) {
       throw new Error('Failed to broadcast transaction');
     }
-
+    const user = await currentUser()
+    const userId = user?.id
     await prisma.transaction.create({
       data: {
         txid,
@@ -143,7 +145,8 @@ export const createAndSendTransaction = async (
         txType: 'withdraw',
         spentStatus: false,
         testnetFlag: network === 'testnet',
-        amount: BigInt(amount)
+        amount: BigInt(amount),
+        userId: userId,
       }
     });
 

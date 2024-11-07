@@ -34,8 +34,8 @@ model Transaction {
   spentStatus Boolean  @default(false)
   testnetFlag Boolean  @default(true)
   amount      BigInt
-  userId      Int?
-  user        User?    @relation(fields: [userId], references: [id])
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [userId])
 }
 
 model Wallet {

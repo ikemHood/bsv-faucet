@@ -6,7 +6,7 @@ import { PrivateKey } from '@bsv/sdk';
 const prisma = new PrismaClient();
 
 const startTransactionMonitor = async () => {
-  const treasuryWIF = process.env.TREASURY_WALLET_WIF as string;
+  const treasuryWIF = process.env.NEXT_PUBLIC_TREASURY_WALLET_WIF as string;
   const privateKey = PrivateKey.fromWif(treasuryWIF);
   const treasuryAddress = privateKey.toAddress('testnet').toString();
 
