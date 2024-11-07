@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
   try {
-    const treasuryWIF = process.env.TREASURY_WALLET_WIF;
+    const treasuryWIF = process.env.NEXT_PUBLIC_TREASURY_WALLET_WIF;
     if (!treasuryWIF) {
       return NextResponse.json({ error: 'No wallet found' }, { status: 404 });
     }
