@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useUser } from '@clerk/nextjs';
 import ReCAPTCHA from 'react-google-recaptcha';
 import {
   Card,
@@ -20,7 +21,6 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Timer, Wallet, History, AlertTriangle } from 'lucide-react';
-import { createAndSendTransaction } from '@/lib/wallet/transactions';
 import { toast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AdminWalletAddress } from '@/lib/utils';
@@ -29,11 +29,14 @@ interface Transaction {
   id: number;
   date: string;
   txid: string;
-  amount: number;
+  amount: string;
   txType: string;
+  vout: Array<{ address: string; satoshis: number }>;
+  userId: string;
 }
 
 export default function DashboardPage() {
+  const { user } = useUser();
   const [address, setAddress] = useState('');
   const [amount, setAmount] = useState('');
   const [captchaValue, setCaptchaValue] = useState('');
@@ -45,6 +48,8 @@ export default function DashboardPage() {
   const [success, setSuccess] = useState('');
 
   const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '';
+  const MAX_WITHDRAWAL = 100000; // 0.001 BSV in satoshis
+  const treasuryWIF = process.env.NEXT_PUBLIC_TREASURY_WALLET_WIF;
 
   const adminWalletAddress = AdminWalletAddress();
 
@@ -54,7 +59,7 @@ export default function DashboardPage() {
       try {
         const [balanceResponse, transactionsResponse] = await Promise.all([
           fetch('/api/wallet/balance'),
-          fetch('/api/transactions')
+          fetch(`/api/transactions/users`)
         ]);
 
         if (!balanceResponse.ok || !transactionsResponse.ok) {
@@ -63,9 +68,8 @@ export default function DashboardPage() {
 
         const balanceData = await balanceResponse.json();
         const transactionsData = await transactionsResponse.json();
-        console.log(adminWalletAddress)
         setFaucetBalance(balanceData.balance);
-        setTransactions(transactionsData.transactions);
+        setTransactions(transactionsData);
       } catch (error) {
         console.error('Error fetching data:', error);
         toast({
@@ -85,7 +89,8 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    const timeLeft = localStorage.getItem('nextRequestTime');
+    if (!user) return;
+    const timeLeft = localStorage.getItem(`nextRequestTime_${user.id}`);
     if (timeLeft) {
       setRemainingTime(Math.max(0, parseInt(timeLeft) - Date.now()));
     }
@@ -95,15 +100,16 @@ export default function DashboardPage() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [user]);
 
   const isValidBSVAddress = (addr: string) =>
     /^[mn2][a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(addr);
 
   const validateForm = () => {
+    if (!user) return 'You must be logged in to request BSV';
     if (!isValidBSVAddress(address)) return 'Invalid BSV testnet address';
-    if (!amount || parseInt(amount) <= 0 || parseInt(amount) > 100000000)
-      return 'Invalid amount (max 1 BSV / 100,000,000 satoshis)';
+    if (!amount || parseInt(amount) <= 0 || parseInt(amount) > MAX_WITHDRAWAL)
+      return `Invalid amount (max ${MAX_WITHDRAWAL} satoshis)`;
     if (!captchaValue) return 'Please complete the captcha';
     if (remainingTime > 0) return 'Please wait for the cooldown period to end';
     return null;
@@ -112,6 +118,7 @@ export default function DashboardPage() {
   const handleRequest = async () => {
     setError('');
     setSuccess('');
+
     const validationError = validateForm();
     if (validationError) {
       setError(validationError);
@@ -120,14 +127,25 @@ export default function DashboardPage() {
 
     try {
       const amountInSatoshis = parseInt(amount);
-      const privKeyWif = process.env.TREASURY_WALLET_WIF as string;
 
-      const txid = await createAndSendTransaction(
-        privKeyWif,
-        address,
-        amountInSatoshis,
-        'testnet'
-      );
+      const response = await fetch('/api/wallet/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          toAddress: address,
+          amount: amountInSatoshis,
+          wif: treasuryWIF
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send transaction');
+      }
+
+      const { txid } = await response.json();
 
       setSuccess(
         `Successfully sent ${amount} satoshis to ${address}. TxID: ${txid}`
@@ -136,19 +154,19 @@ export default function DashboardPage() {
       // Refresh data after successful transaction
       const [balanceResponse, transactionsResponse] = await Promise.all([
         fetch('/api/wallet/balance'),
-        fetch('/api/transactions')
+        fetch(`/api/transactions/users`)
       ]);
 
       if (balanceResponse.ok && transactionsResponse.ok) {
         const balanceData = await balanceResponse.json();
         const transactionsData = await transactionsResponse.json();
         setFaucetBalance(balanceData.balance);
-        setTransactions(transactionsData.transactions);
+        setTransactions(transactionsData);
       }
 
       // Set cooldown period
       const nextRequestTime = Date.now() + 24 * 60 * 60 * 1000;
-      localStorage.setItem('nextRequestTime', nextRequestTime.toString());
+      localStorage.setItem(`nextRequestTime_${user?.id}`, nextRequestTime.toString());
       setRemainingTime(24 * 60 * 60 * 1000);
     } catch (err: any) {
       setError(`Failed to process request: ${err.message}`);
@@ -194,10 +212,10 @@ export default function DashboardPage() {
             />
             <Input
               type="number"
-              placeholder="Amount (in satoshis, max 100,000,000)"
+              placeholder={`Amount (in satoshis, max ${MAX_WITHDRAWAL})`}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              max="100000000"
+              max={MAX_WITHDRAWAL.toString()}
             />
 
             <ReCAPTCHA
