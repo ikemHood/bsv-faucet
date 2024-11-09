@@ -32,6 +32,7 @@ export default function SettingsPage() {
     const fetchUserData = async () => {
       try {
         const response = await axios.get('/api/settings')
+        console.log(response)
         setUserData(response.data.data)
       } catch (err: any) {
         setError(err.response?.data?.error || 'Failed to fetch user data')
@@ -132,7 +133,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" name="email" type="email" defaultValue={userData.email} required />
+                  <Input id="email" disabled name="email" type="email" defaultValue={userData.email} required />
                 </div>
               </CardContent>
               <CardFooter>
