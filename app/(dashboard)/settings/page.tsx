@@ -32,7 +32,6 @@ export default function SettingsPage() {
     const fetchUserData = async () => {
       try {
         const response = await axios.get('/api/settings')
-        console.log(response)
         setUserData(response.data.data)
       } catch (err: any) {
         setError(err.response?.data?.error || 'Failed to fetch user data')

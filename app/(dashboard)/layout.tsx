@@ -9,7 +9,7 @@ import {
   Navigation,
   User2,
   Users2,
-  Shield,
+  Shield
 } from 'lucide-react';
 
 import {
@@ -85,15 +85,16 @@ async function DesktopNav() {
         <NavItem href="/requests" label="Requests">
           <List className="h-5 w-5" />
         </NavItem>
-
-        <NavItem href="/users" label="Users">
-          <Users2 className="h-5 w-5" />
-        </NavItem>
-
         {user?.role === 'admin' && (
-          <NavItem href="/admin" label="Admin">
-            <Shield className="h-5 w-5" />
-          </NavItem>
+          <>
+            <NavItem href="/users" label="Users">
+              <Users2 className="h-5 w-5" />
+            </NavItem>
+
+            <NavItem href="/admin" label="Admin">
+              <Shield className="h-5 w-5" />
+            </NavItem>
+          </>
         )}
 
         {/* <NavItem href="#" label="Analytics">
@@ -151,21 +152,24 @@ async function MobileNav() {
             <List className="h-5 w-5" />
             Requests
           </Link>
-          <Link
-            href="/users"
-            className="flex items-center gap-4 px-2.5 text-foreground"
-          >
-            <Users2 className="h-5 w-5" />
-            Users
-          </Link>
           {user?.role === 'admin' && (
-            <Link
-              href="/admin"
-              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-          >
-            <Shield className="h-5 w-5" />
-              Admin
-            </Link>
+            <>
+              <Link
+                href="/users"
+                className="flex items-center gap-4 px-2.5 text-foreground"
+              >
+                <Users2 className="h-5 w-5" />
+                Users
+              </Link>
+
+              <Link
+                href="/admin"
+                className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+              >
+                <Shield className="h-5 w-5" />
+                Admin
+              </Link>
+            </>
           )}
           <Link
             href="/settings"
@@ -187,4 +191,3 @@ function DashboardBreadcrumb() {
     </div>
   );
 }
-
