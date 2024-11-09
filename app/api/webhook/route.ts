@@ -81,7 +81,6 @@ export async function POST(req: Request) {
       });
     }
 
-    // Add additional event handling here as needed
 
     return new Response('Webhook processed', { status: 200 });
   } catch (error) {
