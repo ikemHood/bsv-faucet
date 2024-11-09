@@ -1,15 +1,5 @@
-import {   WebhookEvent,
-  DeletedObjectJSON,
-  EmailJSON,
-  OrganizationInvitationJSON,
-  OrganizationJSON,
-  OrganizationMembershipJSON,
-  SessionJSON,
-  SMSMessageJSON,
-  UserJSON
-} from '@clerk/nextjs/server';
-import { Webhook } from 'svix'
-
+import { WebhookEvent, UserJSON } from '@clerk/nextjs/server';
+import { Webhook } from 'svix';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 
@@ -54,7 +44,7 @@ export async function POST(req: Request) {
   try {
     if (eventType === 'user.created') {
       const userData = data as UserJSON;
-      
+
       await prisma.user.create({
         data: {
           userId: userData.id,
@@ -63,10 +53,34 @@ export async function POST(req: Request) {
           imageUrl: userData.image_url,
           role: 'user',
           theme: 'light',
-          password: 'defaultPassword123',
+          password: 'defaultPassword123', // Replace with a more secure approach if necessary
         },
       });
     }
+
+    // Handle user updates
+    else if (eventType === 'user.updated') {
+      const userData = data as UserJSON;
+
+      await prisma.user.update({
+        where: { userId: userData.id },
+        data: {
+          username: userData.username || `${userData.first_name || ''}${userData.last_name || ''}`.toLowerCase(),
+          email: userData.email_addresses[0]?.email_address || '',
+          imageUrl: userData.image_url,
+        },
+      });
+    }
+
+    // Handle user deletion
+    else if (eventType === 'user.deleted') {
+      const deletedUserId = data.id as string;
+
+      await prisma.user.delete({
+        where: { userId: deletedUserId },
+      });
+    }
+
     // Add additional event handling here as needed
 
     return new Response('Webhook processed', { status: 200 });
