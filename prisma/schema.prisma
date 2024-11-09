@@ -9,18 +9,29 @@ datasource db {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  userId       String        @unique
-  username     String        @unique
-  email        String        @unique
-  imageUrl     String        @default("/placeholder-user.jpg")
-  role         Role
-  password     String
-  theme        Theme         @default(light)
-  withdrawn    BigInt        @default(0)
-  paused       Boolean       @default(false)
-  createdAt    DateTime      @default(now())
-  transactions Transaction[]
+  id            Int            @id @default(autoincrement())
+  userId        String         @unique // Clerk ID
+  username      String         @unique
+  email         String         @unique
+  imageUrl      String         @default("/placeholder-user.jpg")
+  role          Role
+  password      String
+  theme         Theme          @default(light)
+  withdrawn     BigInt         @default(0)
+  paused        Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  lastActive    DateTime       @default(now())
+  walletAddresses WalletAddress[]
+  transactions  Transaction[]
+  requests      Request[]
+}
+
+model WalletAddress {
+  id        Int      @id @default(autoincrement())
+  address   String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 model Transaction {
@@ -36,13 +47,23 @@ model Transaction {
   amount      BigInt
   userId      String?
   user        User?    @relation(fields: [userId], references: [userId])
+  request     Request? @relation(fields: [requestId], references: [id])
+  requestId   Int?
+
+  @@index([userId, date])
+  @@index([txid])
 }
+
+
 
 model Wallet {
   id         Int      @id @default(autoincrement())
   address    String   @unique
   privateKey String
+  type       WalletType @default(master)
   createdAt  DateTime @default(now())
+  lastUsed   DateTime @default(now())
+  balance    BigInt   @default(0)
 }
 
 enum Role {
@@ -53,4 +74,24 @@ enum Role {
 enum Theme {
   light
   dark
+}
+
+enum RequestType {
+  withdrawal
+  deposit
+  other
+}
+
+enum RequestStatus {
+  pending
+  processing
+  completed
+  failed
+  cancelled
+}
+
+enum WalletType {
+  master
+  hot
+  cold
 }
