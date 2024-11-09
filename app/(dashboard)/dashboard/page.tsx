@@ -89,8 +89,8 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    if (!user) return;
-    const timeLeft = localStorage.getItem(`nextRequestTime_${user.id}`);
+    if (!address) return;
+    const timeLeft = localStorage.getItem(`nextRequestTime_${address}`);
     if (timeLeft) {
       setRemainingTime(Math.max(0, parseInt(timeLeft) - Date.now()));
     }
@@ -100,7 +100,7 @@ export default function DashboardPage() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [user]);
+  }, [address]);
 
   const isValidBSVAddress = (addr: string) =>
     /^[mn2][a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(addr);
@@ -111,7 +111,8 @@ export default function DashboardPage() {
     if (!amount || parseInt(amount) <= 0 || parseInt(amount) > MAX_WITHDRAWAL)
       return `Invalid amount (max ${MAX_WITHDRAWAL} satoshis)`;
     if (!captchaValue) return 'Please complete the captcha';
-    if (remainingTime > 0) return 'Please wait for the cooldown period to end';
+    if (remainingTime > 0)
+      return 'Please wait for the cooldown period to end for this address';
     return null;
   };
 
@@ -164,9 +165,12 @@ export default function DashboardPage() {
         setTransactions(transactionsData);
       }
 
-      // Set cooldown period
+      // Set cooldown period for the wallet address
       const nextRequestTime = Date.now() + 24 * 60 * 60 * 1000;
-      localStorage.setItem(`nextRequestTime_${user?.id}`, nextRequestTime.toString());
+      localStorage.setItem(
+        `nextRequestTime_${address}`,
+        nextRequestTime.toString()
+      );
       setRemainingTime(24 * 60 * 60 * 1000);
     } catch (err: any) {
       setError(`Failed to process request: ${err.message}`);
@@ -227,7 +231,7 @@ export default function DashboardPage() {
               <div className="flex items-center space-x-2 text-yellow-600">
                 <Timer className="h-5 w-5" />
                 <span>
-                  Next request available in:{' '}
+                  Next request available for this address in:{' '}
                   {formatTimeRemaining(remainingTime)}
                 </span>
               </div>
