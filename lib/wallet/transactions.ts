@@ -18,7 +18,7 @@ function transactionToObject(tx: Transaction): Record<string, any> {
   return {
     version: tx.version,
     inputs: tx.inputs.map((input) => ({
-      txid: input.sourceTransaction?.hash.toString(),
+      txid: input.sourceTransaction?.hash('hex') ?? '',
       vout: input.sourceOutputIndex,
       sequence: input.sequence
     })),
