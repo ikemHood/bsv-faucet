@@ -7,12 +7,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
 import { User } from '@/lib/prisma';
 import { useToast } from '@/hooks/use-toast';
-import { togglePauseUser, deleteUser } from './actions';
+import { togglePauseUser, deleteUser, changeUserRole } from './actions';
+import { Role } from '@/prisma/generated/client';
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -107,6 +111,8 @@ export const columns: ColumnDef<User>[] = [
     id: 'actions',
     cell: ({ row }) => {
       const { toast } = useToast();
+      const availableRoles = ['user', 'admin'];
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -117,6 +123,38 @@ export const columns: ColumnDef<User>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>Change Role</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                {availableRoles.map((role) => (
+                  <DropdownMenuItem
+                    key={role}
+                    onClick={async () => {
+                      try {
+                        const selectedRole: Role = Role[role as keyof typeof Role];
+                        const result = await changeUserRole(row.original.userId, selectedRole);
+                        if (result.success) {
+                          toast({
+                            title: 'Role Updated',
+                            description: `User role has been changed to ${role}.`
+                          });
+                        } else {
+                          throw new Error('Failed to change user role');
+                        }
+                      } catch (error) {
+                        toast({
+                          title: 'Error',
+                          description: 'Failed to change user role. Please try again.',
+                          variant: 'destructive'
+                        });
+                      }
+                    }}
+                  >
+                    {role.charAt(0).toUpperCase() + role.slice(1)}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
             <DropdownMenuItem
               onClick={async () => {
                 try {
